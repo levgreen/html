@@ -219,7 +219,7 @@
             width: 100px;
             padding: 4px;
             border: 1px solid #ccc;
-            border-radius: 3px;
+            border-radius: 3;
         }
         .config-btn {
             padding: 4px 10px;
@@ -289,28 +289,29 @@
                 </div>
             </div>
         </div>
-        <!-- 配置预设面板 -->
+
+        <!-- 配置预设面板（已添加重置按钮） -->
         <div class="config-panel">
             <h3>配置预设（4组）</h3>
             <div class="config-row">
                 <div class="config-item">
                     <input type="text" name="cfgName" data-cfg="1" placeholder="配置1名称">
-                    <button class="config-btn btn-save" data-save="1">保持当前</button>
+                    <button class="config-btn btn-save" data-save="1">保存当前</button>
                     <button class="config-btn btn-load" data-load="1">载入</button>
                 </div>
                 <div class="config-item">
                     <input type="text" name="cfgName" data-cfg="2" placeholder="配置2名称">
-                    <button class="config-btn btn-save" data-save="2">保持当前</button>
+                    <button class="config-btn btn-save" data-save="2">保存当前</button>
                     <button class="config-btn btn-load" data-load="2">载入</button>
                 </div>
                 <div class="config-item">
                     <input type="text" name="cfgName" data-cfg="3" placeholder="配置3名称">
-                    <button class="config-btn btn-save" data-save="3">保持当前</button>
+                    <button class="config-btn btn-save" data-save="3">保存当前</button>
                     <button class="config-btn btn-load" data-load="3">载入</button>
                 </div>
                 <div class="config-item">
                     <input type="text" name="cfgName" data-cfg="4" placeholder="配置4名称">
-                    <button class="config-btn btn-save" data-save="4">保持当前</button>
+                    <button class="config-btn btn-save" data-save="4">保存当前</button>
                     <button class="config-btn btn-load" data-load="4">载入</button>
                 </div>
             </div>
@@ -318,6 +319,7 @@
                 <button class="config-btn btn-export" id="exportCfg">导出全部配置</button>
                 <button class="config-btn btn-import" id="importCfgBtn">载入配置文件</button>
                 <input type="file" class="config-file-input" id="importFile" accept=".json">
+                <button class="config-btn" style="background:#f44336;color:#fff" id="resetQtyBtn">重置所有数量</button>
             </div>
         </div>
 
@@ -985,11 +987,11 @@
         // 加成类型
         const BONUS = {
             BASE: 'base',       // 孙策 + 通用非元宝
-            SPEED: 'speed',     // + 通用加速
+            SPEED: 'speed',     // + 使用加速
             SHANGCHE: 'shangche', // + 商车
             FENGHUO: 'fenghuo', // + 烽火
             ZHAOMU: 'zhaomu',   // + 招募
-            LIANBING: 'lianbing' // + 练兵
+            LIANBING: 'lianbing' // + 训练士兵
         };
 
         // 每天的项目配置：初始值, 加成类型, 额外乘数
@@ -1060,10 +1062,12 @@
             return STORAGE_KEY_PREFIX + id;
         }
         function saveInput(el) {
+            if(!el) return;
             const key = getStoreKey(el.id || el.dataset.qty);
             localStorage.setItem(key, el.value);
         }
         function loadInput(el, defaultVal = "") {
+            if(!el) return;
             const key = getStoreKey(el.id || el.dataset.qty);
             const val = localStorage.getItem(key);
             if (val !== null && val !== "") {
@@ -1075,28 +1079,29 @@
 
         // 获取加成总和
         function getBonus(type) {
-            const sunce = parseFloat(document.getElementById('bonus-sunce').value) || 0;
-            const feiyuanbao = parseFloat(document.getElementById('bonus-feiyuanbao').value) || 0;
+            const sunce = parseFloat(document.getElementById('bonus-sunce')?.value || 0);
+            const feiyuanbao = parseFloat(document.getElementById('bonus-feiyuanbao')?.value || 0);
             let base = sunce + feiyuanbao;
             switch(type) {
                 case BONUS.BASE: return base;
-                case BONUS.SPEED: return base + (parseFloat(document.getElementById('bonus-jiasu').value) || 0);
-                case BONUS.SHANGCHE: return base + (parseFloat(document.getElementById('bonus-shangche').value) || 0);
-                case BONUS.FENGHUO: return base + (parseFloat(document.getElementById('bonus-fenghuo').value) || 0);
-                case BONUS.ZHAOMU: return base + (parseFloat(document.getElementById('bonus-zhaomu').value) || 0);
-                case BONUS.LIANBING: return base + (parseFloat(document.getElementById('bonus-lianbing').value) || 0);
+                case BONUS.SPEED: return base + (parseFloat(document.getElementById('bonus-jiasu')?.value || 0));
+                case BONUS.SHANGCHE: return base + (parseFloat(document.getElementById('bonus-shangche')?.value || 0));
+                case BONUS.FENGHUO: return base + (parseFloat(document.getElementById('bonus-fenghuo')?.value || 0));
+                case BONUS.ZHAOMU: return base + (parseFloat(document.getElementById('bonus-zhaomu')?.value || 0));
+                case BONUS.LIANBING: return base + (parseFloat(document.getElementById('bonus-lianbing')?.value || 0));
                 default: return base;
             }
         }
 
         // 练兵轮数
         function getTrainCount() {
-            return parseFloat(document.getElementById('train-count').value) || 0;
+            const trainEl = document.getElementById('train-count');
+            return parseFloat(trainEl?.value || 0);
         }
 
         // 数字格式化
         function formatNum(num) {
-            if (num === 0) return '0';
+            if (isNaN(num) || num === 0) return '0';
             if (Number.isInteger(num)) return num.toLocaleString();
             return num.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
         }
@@ -1108,20 +1113,32 @@
                 let sum = 0;
                 items.forEach((item, idx) => {
                     const i = idx + 1;
+                    const qtyEl = document.querySelector(`[data-qty="d${day}-${i}"]`);
+                    const cEl = document.querySelector(`[data-calc="c${day}-${i}"]`);
+                    const eEl = document.querySelector(`[data-calc="e${day}-${i}"]`);
+                    const gEl = document.querySelector(`[data-calc="g${day}-${i}"]`);
+                    if(!qtyEl || !cEl || !eEl || !gEl) return;
+
                     const bonus = getBonus(item.bonus);
                     const currentScore = item.init * (1 + bonus / 100);
-                    const qty = parseFloat(document.querySelector(`[data-qty="d${day}-${i}"]`).value) || 0;
+                    const qty = parseFloat(qtyEl.value || 0);
                     let mult = item.mult;
                     if (mult === 'train') mult = getTrainCount();
                     const earned = currentScore * qty * mult;
                     sum += earned;
-                    document.querySelector(`[data-calc="c${day}-${i}"]`).textContent = formatNum(currentScore);
-                    document.querySelector(`[data-calc="e${day}-${i}"]`).textContent = formatNum(earned);
-                    document.querySelector(`[data-calc="g${day}-${i}"]`).textContent = bonus.toFixed(1);
+
+                    cEl.textContent = formatNum(currentScore);
+                    eEl.textContent = formatNum(earned);
+                    gEl.textContent = bonus.toFixed(1);
                 });
-                const existing = parseFloat(document.querySelector(`[data-qty="f${day}"]`).value) || 0;
-                document.querySelector(`[data-calc="sum${day}"]`).textContent = formatNum(sum);
-                document.querySelector(`[data-calc="total${day}"]`).textContent = formatNum(sum + existing);
+                const fEl = document.querySelector(`[data-qty="f${day}"]`);
+                const sumEl = document.querySelector(`[data-calc="sum${day}"]`);
+                const totalEl = document.querySelector(`[data-calc="total${day}"]`);
+                if(sumEl) sumEl.textContent = formatNum(sum);
+                if(fEl && totalEl){
+                    const existing = parseFloat(fEl.value || 0);
+                    totalEl.textContent = formatNum(sum + existing);
+                }
             }
         }
 
@@ -1136,19 +1153,30 @@
             });
         });
 
-        // ====================== 配置预设相关 ======================
-        let configList = JSON.parse(localStorage.getItem(CFG_STORE_KEY)) || [
-            {name:"配置1",data:{}},
-            {name:"配置2",data:{}},
-            {name:"配置3",data:{}},
-            {name:"配置4",data:{}}
-        ];
+        // ====================== 配置预设相关 修复全部BUG ======================
+        let configList = [];
+        // 安全读取本地配置
+        try {
+            const raw = localStorage.getItem(CFG_STORE_KEY);
+            if(raw) configList = JSON.parse(raw);
+        } catch (e) {}
+        // 兜底默认4组配置
+        if(!Array.isArray(configList) || configList.length !== 4){
+            configList = [
+                {name:"配置1",data:{}},
+                {name:"配置2",data:{}},
+                {name:"配置3",data:{}},
+                {name:"配置4",data:{}}
+            ];
+        }
+
         function saveConfigToLocal(){
             localStorage.setItem(CFG_STORE_KEY, JSON.stringify(configList));
         }
         function getAllInputData(){
             const data = {};
             document.querySelectorAll('input[type="number"].cell-input').forEach(inp=>{
+                if(!inp) return;
                 const key = getStoreKey(inp.id || inp.dataset.qty);
                 data[key] = inp.value;
             });
@@ -1156,22 +1184,24 @@
         }
         function fillAllInput(data){
             document.querySelectorAll('input[type="number"].cell-input').forEach(inp=>{
+                if(!inp) return;
                 const key = getStoreKey(inp.id || inp.dataset.qty);
                 if(data[key] !== undefined){
                     inp.value = data[key];
+                    inp.dispatchEvent(new Event('input'));
                 }
             });
             recalcAll();
         }
+        // 修复变量错误：configList
         function renderConfigNames(){
             for(let i=0;i<4;i++){
-                const cfg = configList[i];
                 const nameInput = document.querySelector(`input[name="cfgName"][data-cfg="${i+1}"]`);
-                nameInput.value = cfg.name;
+                if(nameInput) nameInput.value = configList[i].name;
             }
         }
         function bindConfigEvent(){
-            // 重命名
+            // 修复选择器 input[name="cfgName"]
             document.querySelectorAll('input[name="cfgName"]').forEach(input=>{
                 input.addEventListener('input',()=>{
                     const idx = Number(input.dataset.cfg) - 1;
@@ -1201,7 +1231,7 @@
                     alert(`已载入【${cfg.name}】`);
                 });
             });
-            // 导出json
+            // 导出配置JSON
             document.getElementById('exportCfg').addEventListener('click',()=>{
                 const blob = new Blob([JSON.stringify(configList,null,2)],{type:"application/json"});
                 const a = document.createElement("a");
@@ -1210,7 +1240,7 @@
                 a.click();
                 URL.revokeObjectURL(a.href);
             });
-            // 导入文件触发
+            // 导入按钮触发文件选择
             document.getElementById('importCfgBtn').addEventListener('click',()=>{
                 document.getElementById('importFile').click();
             });
@@ -1223,7 +1253,7 @@
                     try{
                         const json = JSON.parse(ev.target.result);
                         if(!Array.isArray(json) || json.length !==4){
-                            alert("配置文件错误，必须包含4组预设");
+                            alert("配置文件格式错误，必须包含4组预设");
                             return;
                         }
                         configList = json;
@@ -1231,11 +1261,23 @@
                         renderConfigNames();
                         alert("配置导入成功");
                     }catch(err){
-                        alert("文件解析失败，非有效配置文件");
+                        alert("文件解析失败，不是有效JSON");
                     }
                 };
                 reader.readAsText(file);
                 e.target.value = "";
+            });
+            // 重置所有数量按钮
+            document.getElementById('resetQtyBtn').addEventListener('click', () => {
+                if (!confirm("确认清空全部天数的数量输入框？全局加成、已有积分、练兵轮数不会变动")) return;
+                const qtyInputs = document.querySelectorAll('input[data-qty^="d"]');
+                qtyInputs.forEach(input => {
+                    input.value = "";
+                    saveInput(input);
+                    input.dispatchEvent(new Event('input'));
+                });
+                recalcAll();
+                //alert("所有项目数量已清零完成");
             });
         }
         function initConfig(){
@@ -1246,14 +1288,14 @@
         function init() {
             const allInputs = document.querySelectorAll('input[type="number"].cell-input');
             allInputs.forEach(input => {
+                if(!input) return;
                 let def = "";
                 if(input.id === "bonus-sunce") def = "30";
-                if(input.id === "bonus-jiasu") def = "55";
-                if(input.id === "bonus-feiyuanbao") def = "27.5";
-                if(input.id === "bonus-shangche") def = "58";
                 if(input.id === "bonus-fenghuo") def = "64";
                 if(input.id === "bonus-zhaomu") def = "52";
+                if(input.id === "bonus-jiasu") def = "55";
                 if(input.id === "bonus-lianbing") def = "52";
+                if(input.id === "bonus-feiyuanbao") def = "27.5";
                 if(input.id === "train-count") def = "801";
                 if(input.dataset.qty === "f1") def = "13808336";
                 loadInput(input, def);
