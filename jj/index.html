@@ -801,7 +801,7 @@
                         <td class="calc-cell" data-calc="g5-8"></td>
                     </tr>
                     <tr>
-                        <td class="item-name">11级</td>
+                        <td class="item-name">11级(宫一)</td>
                         <td class="calc-cell" data-calc="c5-9"></td>
                         <td><input type="number" class="cell-input" data-qty="d5-9"></td>
                         <td class="calc-cell" data-calc="e5-9"></td>
@@ -809,7 +809,7 @@
                         <td class="calc-cell" data-calc="g5-9"></td>
                     </tr>
                     <tr>
-                        <td class="item-name">12级</td>
+                        <td class="item-name">12级(宫二)</td>
                         <td class="calc-cell" data-calc="c5-10"></td>
                         <td><input type="number" class="cell-input" data-qty="d5-10"></td>
                         <td class="calc-cell" data-calc="e5-10"></td>
@@ -817,7 +817,7 @@
                         <td class="calc-cell" data-calc="g5-10"></td>
                     </tr>
                     <tr>
-                        <td class="item-name">13级</td>
+                        <td class="item-name">13级(宫三)</td>
                         <td class="calc-cell" data-calc="c5-11"></td>
                         <td><input type="number" class="cell-input" data-qty="d5-11"></td>
                         <td class="calc-cell" data-calc="e5-11"></td>
@@ -825,7 +825,7 @@
                         <td class="calc-cell" data-calc="g5-11"></td>
                     </tr>
                     <tr>
-                        <td class="item-name">14级</td>
+                        <td class="item-name">14级(宫四)</td>
                         <td class="calc-cell" data-calc="c5-12"></td>
                         <td><input type="number" class="cell-input" data-qty="d5-12"></td>
                         <td class="calc-cell" data-calc="e5-12"></td>
@@ -833,7 +833,7 @@
                         <td class="calc-cell" data-calc="g5-12"></td>
                     </tr>
                     <tr>
-                        <td class="item-name">15级</td>
+                        <td class="item-name">15级(宫五)</td>
                         <td class="calc-cell" data-calc="c5-13"></td>
                         <td><input type="number" class="cell-input" data-qty="d5-13"></td>
                         <td class="calc-cell" data-calc="e5-13"></td>
@@ -971,7 +971,7 @@
             1. 黄色背景的单元格可以编辑，灰色单元格为自动计算结果<br>
             2. 顶部全局加成修改后，所有天数的积分会自动重新计算<br>
             3. 现积分值 = 初始值 × (1 + 倍数%)<br>
-            4. 获取积分 = 现积分值 × 数量 × 额外乘数（采集食物木材×10、煤×20、铁×40、练兵等级×单次练兵轮数）<br>
+            4. 获取积分 = 现积分值 × 数量 × 额外乘数（采集食物、木材、煤、铁填写采集数量(240即240W)、练兵等级×单次练兵轮数）<br>
             5. 总积分 = 已有积分 + 可获取积分<br>
             6. 所有输入数据自动本地保存，关闭/刷新页面下次打开自动恢复<br>
             7. 配置功能：4组预设，自定义名称、保存当前数值、载入、导出/导入json备份
@@ -1002,8 +1002,8 @@
                 { name: '烽火台', init: 25000, bonus: BONUS.FENGHUO, mult: 1 },
                 { name: '采集1000食物', init: 10, bonus: BONUS.BASE, mult: 10 },
                 { name: '采集1000木材', init: 10, bonus: BONUS.BASE, mult: 10 },
-                { name: '500煤', init: 10, bonus: BONUS.BASE, mult: 20 },
-                { name: '250铁', init: 10, bonus: BONUS.BASE, mult: 40 },
+                { name: '采集500煤', init: 10, bonus: BONUS.BASE, mult: 20 },
+                { name: '采集250铁', init: 10, bonus: BONUS.BASE, mult: 40 },
             ],
             2: [
                 { name: '乾坤寻将', init: 35000, bonus: BONUS.BASE, mult: 1 },
@@ -1040,11 +1040,11 @@
                 { name: '8级', init: 134, bonus: BONUS.LIANBING, mult: 'train' },
                 { name: '9级', init: 155, bonus: BONUS.LIANBING, mult: 'train' },
                 { name: '10级', init: 182, bonus: BONUS.LIANBING, mult: 'train' },
-                { name: '11级', init: 210, bonus: BONUS.LIANBING, mult: 'train' },
-                { name: '12级', init: 240, bonus: BONUS.LIANBING, mult: 'train' },
-                { name: '13级', init: 270, bonus: BONUS.LIANBING, mult: 'train' },
-                { name: '14级', init: 300, bonus: BONUS.LIANBING, mult: 'train' },
-                { name: '15级', init: 340, bonus: BONUS.LIANBING, mult: 'train' },
+                { name: '11级(宫一)', init: 210, bonus: BONUS.LIANBING, mult: 'train' },
+                { name: '12级(宫二)', init: 240, bonus: BONUS.LIANBING, mult: 'train' },
+                { name: '13级(宫三)', init: 270, bonus: BONUS.LIANBING, mult: 'train' },
+                { name: '14级(宫四)', init: 300, bonus: BONUS.LIANBING, mult: 'train' },
+                { name: '15级(宫五)', init: 340, bonus: BONUS.LIANBING, mult: 'train' },
             ],
             6: [
                 { name: '坐骑碎片', init: 100000, bonus: BONUS.BASE, mult: 1 },
