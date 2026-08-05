@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>积分计算器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: "Microsoft YaHei", Arial, sans-serif;
+            background-color: #f5f5f5;
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        h1 {
+            text-align: center;
+            padding: 20px;
+            background: #4a90d9;
+            color: #fff;
+            font-size: 24px;
+        }
+        /* 全局加成区 */
+        .global-bonus {
+            padding: 15px 20px;
+            background: #f9f9f9;
+            border-bottom: 1px solid #eee;
+        }
+        .global-bonus h3 {
+            margin-bottom: 10px;
+            font-size: 16px;
+            color: #555;
+        }
+        .bonus-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px 30px;
+            align-items: center;
+        }
+        .bonus-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 130px;
+        }
+        .bonus-item label {
+            font-size: 14px;
+            color: #666;
+            white-space: nowrap;
+        }
+        .bonus-item input {
+            width: 70px;
+            padding: 5px 8px;
+            border: 1px solid #e0c060;
+            border-radius: 4px;
+            text-align: center;
+            background: #fff9c4;
+            font-size: 14px;
+        }
+        /* Tab 标签 */
+        .tabs {
+            display: flex;
+            background: #e8e8e8;
+            border-bottom: 1px solid #ddd;
+        }
+        .tab {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 500;
+            color: #666;
+            transition: all 0.2s;
+            border-bottom: 3px solid transparent;
+        }
+        .tab:hover {
+            background: #ddd;
+        }
+        .tab.active {
+            background: #fff;
+            color: #4a90d9;
+            border-bottom-color: #4a90d9;
+        }
+        /* 表格区 */
+        .tab-content {
+            display: none;
+            padding: 20px;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        th, td {
+            padding: 10px 12px;
+            text-align: center;
+            border: 1px solid #e0e0e0;
+        }
+        th {
+            background: #f0f4f8;
+            font-weight: 600;
+            color: #555;
+        }
+        td.item-name {
+            text-align: left;
+            padding-left: 15px;
+            background: #fafafa;
+            font-weight: 500;
+        }
+        /* 可输入单元格 */
+        input.cell-input {
+            width: 100%;
+            padding: 6px 8px;
+            border: 1px solid #e0c060;
+            border-radius: 3px;
+            text-align: center;
+            background: #fff9c4;
+            font-size: 14px;
+            font-family: inherit;
+        }
+        input.cell-input:focus {
+            outline: none;
+            border-color: #f5a623;
+            box-shadow: 0 0 3px rgba(245,166,35,0.3);
+        }
+        /* 计算结果单元格 */
+        td.calc-cell {
+            background: #f5f5f5;
+            color: #333;
+            font-family: "Consolas", monospace;
+        }
+        td.initial-cell {
+            background: #f0f0f0;
+            color: #666;
+            font-family: "Consolas", monospace;
+        }
+        /* 汇总行 */
+        tr.summary-row td {
+            background: #e8f4fd !important;
+            font-weight: 600;
+            color: #2c7bb6;
+        }
+        tr.summary-row td.item-name {
+            background: #d6eaf8 !important;
+        }
+        /* 总积分高亮 */
+        .total-score {
+            font-size: 18px !important;
+            color: #d32f2f !important;
+            font-weight: 700 !important;
+        }
+        /* 说明文字 */
+        .note {
+            margin-top: 15px;
+            padding: 10px 15px;
+            background: #fffbe6;
+            border-left: 4px solid #faad14;
+            font-size: 13px;
+            color: #8c6d1f;
+            line-height: 1.6;
+        }
+        .train-tip {
+            font-size: 12px;
+            color: #999;
+            margin-top: 4px;
+        }
+        /* 响应式 */
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            h1 { font-size: 20px; padding: 15px; }
+            .tabs { flex-wrap: wrap; }
+            .tab { flex: none; width: 33.33%; font-size: 13px; padding: 10px 5px; }
+            th, td { padding: 8px 6px; font-size: 12px; }
+            input.cell-input { padding: 4px; font-size: 12px; }
+            .bonus-row { gap: 10px; }
+            .bonus-item input { width: 60px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>积分计算器</h1>
+        
+        <!-- 全局加成设置 -->
+<div class="global-bonus">
+    <h3>全局加成设置（黄色可编辑）</h3>
+    <div class="bonus-row">
+        <div class="bonus-item">
+            <label style="width:70px; text-align:right;">孙策：</label>
+            <input type="number" id="bonus-sunce" class="cell-input" step="0.5">
+        </div>
+        <div class="bonus-item">
+            <label style="width:70px; text-align:right;">通用加速：</label>
+            <input type="number" id="bonus-jiasu" class="cell-input" step="0.5">
+        </div>
+        <div class="bonus-item">
+            <label style="width:70px; text-align:right;">通用非元宝：</label>
+            <input type="number" id="bonus-feiyuanbao" class="cell-input" step="0.5">
+        </div>
+        <div class="bonus-item">
+            <label style="width:70px; text-align:right;">商车：</label>
+            <input type="number" id="bonus-shangche" class="cell-input" step="0.5">
+        </div>
+        <div class="bonus-item">
+            <label style="width:70px; text-align:right;">烽火：</label>
+            <input type="number" id="bonus-fenghuo" class="cell-input" step="0.5">
+        </div>
+        <div class="bonus-item">
+            <label style="width:70px; text-align:right;">招募：</label>
+            <input type="number" id="bonus-zhaomu" class="cell-input" step="0.5">
+        </div>
+        <div class="bonus-item">
+            <label style="width:70px; text-align:right;">练兵：</label>
+            <input type="number" id="bonus-lianbing" class="cell-input" step="0.5">
+        </div>
+    </div>
+</div>
+
+        <!-- Tab 标签 -->
+        <div class="tabs">
+            <div class="tab active" data-day="1">第一天</div>
+            <div class="tab" data-day="2">第二天</div>
+            <div class="tab" data-day="3">第三天</div>
+            <div class="tab" data-day="4">第四天</div>
+            <div class="tab" data-day="5">第五天</div>
+            <div class="tab" data-day="6">第六天</div>
+        </div>
+
+        <!-- 第一天 -->
+        <div class="tab-content active" id="day1">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width:22%">项目</th>
+                        <th>现积分值</th>
+                        <th>数量</th>
+                        <th>获取积分</th>
+                        <th>初始值</th>
+                        <th>倍数(%)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="item-name">消耗武器通用</td>
+                        <td class="calc-cell" data-calc="c1-1"></td>
+                        <td><input type="number" class="cell-input" data-qty="d1-1"></td>
+                        <td class="calc-cell" data-calc="e1-1"></td>
+                        <td class="initial-cell">10000</td>
+                        <td class="calc-cell" data-calc="g1-1"></td>
+                    </tr>
+                    <tr>
+                        <td class="item-name">装备锻造</td>
+                        <td class="calc-cell" data-calc="c1-2"></td>
+                        <td><input type="number" class="cell-input" data-qty="d1-2"></td>
+                        <td class="calc-cell" data-calc="e1-2"></td>
+                        <td class="initial-cell">10000</td>
+                        <td class="calc-cell" data-calc="g1-2"></td>
+                    </tr>
+                    <tr>
+                        <td class="item-name">烽火台</td>
+                        <td class="calc-cell" data-calc="c1-3"></td>
+                        <td><input type="number" class="cell-input" data-qty="d1-3"></td>
+                        <td class="calc-cell" data-calc="e1-3"></td>
+                        <td class="initial-cell">25000</td>
+                        <td class="calc-cell" data-calc="g1-3"></td>
+                    </tr>
+                    <tr>
+                        <td class="item-name">采集1000食物</td>
+                        <td class="calc-cell" data-calc="c1-4"></td>
+                        <td><input type="number" class="cell-input" data-qty="d1-4"></td>
+                        <td class="calc-cell" data-calc="e1-4"></td>
+                        <td class="initial-cell">10</td>
+                        <td class="calc-cell" data-calc="g1-4"></td>
+                    </tr>
+                    <tr>
+                        <td class="item-name">采集1000木材</td>
+                        <td class="calc-cell" data-calc="c1-5"></td>
+                        <td><input type="number" class="cell-input" data-qty="d1-5"></td>
+                        <td class="calc-cell" data-calc="e1-5"></td>
+                        <td class="initial-cell">10</td>
+                        <td class="calc-cell" data-calc="g1-5"></td>
+                    </tr>
+                    <tr>
+                        <td class="item-name">500煤</td>
+                        <td class="calc-cell" data-calc="c1-6"></td>
+                        <td><input type="number" class="cell-input" data-qty="d1-6"></td>
+                        <td class="calc-cell" data-calc="e1-6"></td>
+                        <td class="initial-cell">10</td>
+                        <td class="calc-cell" data-calc="g1-6"></td>
+                    </tr>
+                    <tr>
+                        <td class="item-name">250铁</td>
+                        <td class="calc-cell" data-calc="c1-7"></td>
+                        <td><input type="number" class="cell-input" data-qty="d1-7"></td>
+                        <td class="calc-cell" data-calc="e1-7"></td>
+                        <td class="initial-cell">10</td>
+                        <td class="calc-cell" data-calc="g1-7"></td>
+                    </tr>
+                    <tr class="summary-row">
+                        <td class="item-name">可获取积分</td>
+                        <td></td>
+                        <td></td>
+                        <td class="calc-cell" data-calc="sum1"></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr class="summary-row">
+                        <td class="item-name">已有积分</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td><input type="number" class="cell-input" data-qty="f1"></td>
+                        <td></td>
+                    </tr>
+                    <tr class="summary-row">
+                        <td class="item-name">总积分</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td class="calc-cell total-score" data-calc="total1"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 第二天 -->
+        <div class="tab-content" id="day2">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width:22%">项目</th>
+                        <th>现积分值</th>
+                        <th>数量</th>
+                        <th>获取积分</th>
+                        <th>初始值</th>
+                        <th>倍数(%)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="item-name">乾坤寻将</td>
+                        <td class="calc-cell" data-calc="c2-1"></td>
+                        <td><input type="number" class="cell-input" data-qty="d2-1"></td>
+                        <td class="calc-cell" data-calc="e2-1"></td>
+                        <td class="initial-cell">35000</td>
+                        <td class="calc-cell" data-calc="g2-1"></td>
+                    </tr>
+                    <tr>
+                        <td class="item-name">普通招募</td>
+                        <td class="calc-cell" data-calc="c2-2"></td>
+                        <td><input type="number" class="cell-input" data-qty="d2-2"></td>
+                        <td class="calc-cell" data-calc="e2-2"></td>
+                        <td class="initial-cell">800</td>
+                        <td class="calc-cell" data-calc="g2-2"></td>
+                    </tr>
+                    <tr>
+                        <td class="item-name">高级招募</td>
+                        <td class="calc-cell" data-calc="c2-3"></td>
+                        <td><input type="number" class="cell-input" data-qty="d2-3"></td>
+                        <td class="calc-cell" data-calc="e2-3"></td>
+                        <td class="initial-cell">2500</td>
+                        <td class="calc-cell" data-calc="g2-3"></td>
+                    </tr>
+                    <tr>
+                        <td class="item-name">蓝色碎片</td>
+                        <td class="calc-cell" data-calc="c2-4"></td>
+                        <td><input type="number" class="cell-input" data-qty="d2-4"></td>
+                        <td class="calc-cell" data-calc="e2-4"></td>
+                        <td class="initial-cell">800</td>
+                        <td class="calc-cell" data-calc="g2-4"></td>
+                    </tr>
+                    <tr>
+                        <td class="item-name">紫色碎片</td>
+                        <td class="calc-cell" data-calc="c2-5"></td>
+                        <td><input type="number" class="cell-input" data-qty="d2-5"></td>
+                        <td class="calc-cell" data-calc="e2-5"></td>
+                        <td class="initial-cell">2500</td>
+                        <td class="calc-cell" data-calc="g2-5"></td>
+                    </tr>
+                    <tr>
+                        <td class="item-name">橙色碎片</td>
+                        <td class="calc-cell" data-calc="c2-6"></td>
+                        <td><input type="number" class="cell-input" data-qty="d2-6"></td>
+                        <td class="calc-cell" data-calc="e2-6"></td>
+                        <td class="initial-cell">6000</td>
+                        <td class="calc-cell" data-calc="g2-6"></td>
+                    </tr>
+                    <tr class="summary-row">
+                        <td class="item-name">可获取积分</td>
+                        <td></td>
+                        <td></td>
+                        <td class="calc-cell" data-calc="sum2"></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr class="summary-row">
+                        <td class="item-name">已有积分</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td><input type="number" class="cell-input" data-qty="f2"></td>
+                        <td></td>
+                    </tr>
+                    <tr class="summary-row">
+                        <td class="item-name">总积分</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td class="calc-cell total-score" data-calc="total2"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 第三天 -->
+        <div class="tab-content" id="day3">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width:22%">项目</th>
+                        <th>现积分值</th>
+                        <th>数量</th>
+                        <th>获取积分</th>
+                        <th>初始值</th>
+                        <th>倍数(%)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="item-name">转运符</td>
+                        <td class="calc-cell" data-calc="c3-1"></td>
+                        <td><input type="number" class="cell-input" data-qty="d3-1"></td>
+                        <td class="calc-cell" data-calc="e3-1"></td>
+                        <td class="initial-cell">4000</td>
+                        <td class="calc-cell" data-calc="g3-1"></td>
+                    </tr>
+                    <tr>
+                        <td class="item-name">璞玉</td>
+                        <td class="calc-cell" data-calc="c3-2"></td>
+                        <td><input type="number" class="cell-input" data-qty="d3-2"></td>
+                        <td class="calc-cell" data-calc="e3-2"></td>
+                        <td class="initial-cell">5000</td>
+                        <td class="calc-cell" data-calc="g3-2"></td>
+                    </tr>
+                    <tr>
+                        <td class="item-name">琢玉刀</td>
+                        <td class="calc-cell" data-calc="c3-3"></td>
+                        <td><input type="number" class="cell-input" data-qty="d3-3"></td>
+                        <td class="calc-cell" data-calc="e3-3"></td>
+                        <td class="initial-cell">25000</td>
+                        <td class="calc-cell" data-calc="g3-3"></td>
+                    </tr>
+                    <tr>
+                        <td class="item-name">汉白玉</td>
+                        <td class="calc-cell" data-calc="c3-4"></td>
+                        <td><input type="number" class="cell-input" data-qty="d3-4"></td>
+                        <td class="calc-cell" data-calc="e3-4"></td>
+                        <td class="initial-cell">20000</td>
+                        <td class="calc-cell" data-calc="g3-4"></td>
+                    </tr>
+                    <tr>
+                        <td class="item-name">1min建筑</td>
+                        <td class="calc-cell" data-calc="c3-5"></td>
+                        <td><input type="number" class="cell-input" data-qty="d3-5"></td>
+                        <td class="calc-cell" data-calc="e3-5"></td>
+                        <td class="initial-cell">150</td>
+                        <td class="calc-cell" data-calc="g3-5"></td>
+                    </tr>
+                    <tr>
+                        <td class="item-name">回收普通</td>
+                        <td class="calc-cell" data-calc="c3-6"></td>
+                        <td><input type="number" class="cell-input" data-qty="d3-6"></td>
+                        <td class="calc-cell" data-calc="e3-6"></td>
+                        <td class="initial-cell">2000</td>
+                        <td class="calc-cell" data-calc="g3-6"></td>
+                    </tr>
+                    <tr>
+                        <td class="item-name">回收精良</td>
+                        <td class="calc-cell" data-calc="c3-7"></td>
+                        <td><input type="number" class="cell-input" data-qty="d3-7"></td>
+                        <td class="calc-cell" data-calc="e3-7"></td>
+                        <td class="initial-cell">5000</td>
+                        <td class="calc-cell" data-calc="g3-7"></td>
+                    </tr>
+                    <tr>
+                        <td class="item-name">回收稀有</td>
+                        <td class="calc-cell" data-calc="c3-8"></td>
+                        <td><input type="number" class="cell-input" data-qty="d3-8"></td>
+                        <td class="calc-cell" data-calc="e3-8"></td>
+                        <td class="initial-cell">30000</td>
+                        <td class="calc-cell" data-calc="g3-8"></td>
+                    </tr>
+                    <tr>
+                        <td class="item-name">回收史诗</td>
+                        <td class="calc-cell" data-calc="c3-9"></td>
+                        <td><input type="number" class="cell-input" data-qty="d3-9"></td>
+                        <td class="calc-cell" data-calc="e3-9"></td>
+                        <td class="initial-cell">200000</td>
+                        <td class="calc-cell" data-calc="g3-9"></td>
+                    </tr>
+                    <tr>
+                        <td class="item-name">金色商车</td>
+                        <td class="calc-cell" data-calc="c3-10"></td>
+                        <td><input type="number" class="cell-input" data-qty="d3-10"></td>
+                        <td class="calc-cell" data-calc="e3-10"></td>
+                        <td class="initial-cell">200000</td>
+                        <td class="calc-cell" data-calc="g3-10"></td>
+                    </tr>
+                    <tr class="summary-row">
+                        <td class="item-name">可获取积分</td>
+                        <td></td>
+                        <td></td>
+                        <td class="calc-cell" data-calc="sum3"></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr class="summary-row">
+                        <td class="item-name">已有积分</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td><input type="number" class="cell-input" data-qty="f3"></td>
+                        <td></td>
+                    </tr>
+                    <tr class="summary-row">
+                        <td class="item-name">总积分</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td class="calc-cell total-score" data-calc="total3"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 第四天 -->
+        <div class="tab-content" id="day4">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width:22%">项目</th>
+                        <th>现积分值</th>
+                        <th>数量</th>
+                        <th>获取积分</th>
+                        <th>初始值</th>
+                        <th>倍数(%)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="item-name">锻造石</td>
+                        <td class="calc-cell" data-calc="c4-1"></td>
+                        <td><input type="number" class="cell-input" data-qty="d4-1"></td>
+                        <td class="calc-cell" data-calc="e4-1"></td>
+                        <td class="initial-cell">10000</td>
+                        <td class="calc-cell" data-calc="g4-1"></td>
+                    </tr>
+                    <tr>
+                        <td class="item-name">研究加速</td>
+                        <td class="calc-cell" data-calc="c4-2"></td>
+                        <td><input type="number" class="cell-input" data-qty="d4-2"></td>
+                        <td class="calc-cell" data-calc="e4-2"></td>
+                        <td class="initial-cell">150</td>
+                        <td class="calc-cell" data-calc="g4-2"></td>
+                    </tr>
+                    <tr>
+                        <td class="item-name">六稻图</td>
+                        <td class="calc-cell" data-calc="c4-3"></td>
+                        <td><input type="number" class="cell-input" data-qty="d4-3"></td>
+                        <td class="calc-cell" data-calc="e4-3"></td>
+                        <td class="initial-cell">100</td>
+                        <td class="calc-cell" data-calc="g4-3"></td>
+                    </tr>
+                    <tr>
+                        <td class="item-name">烽火台</td>
+                        <td class="calc-cell" data-calc="c4-4"></td>
+                        <td><input type="number" class="cell-input" data-qty="d4-4"></td>
+                        <td class="calc-cell" data-calc="e4-4"></td>
+                        <td class="initial-cell">25000</td>
+                        <td class="calc-cell" data-calc="g4-4"></td>
+                    </tr>
+                    <tr class="summary-row">
+                        <td class="item-name">可获取积分</td>
+                        <td></td>
+                        <td></td>
+                        <td class="calc-cell" data-calc="sum4"></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr class="summary-row">
+                        <td class="item-name">已有积分</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td><input type="number" class="cell-input" data-qty="f4"></td>
+                        <td></td>
+                    </tr>
+                    <tr class="summary-row">
+                        <td class="item-name">总积分</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td class="calc-cell total-score" data-calc="total4"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 第五天 -->
+        <div class="tab-content" id="day5">
+            <div style="margin-bottom:12px; padding:8px 12px; background:#f0f7ff; border-radius:4px; font-size:13px; color:#4a6fa5;">
+                <label style="font-weight:600;">单次练兵轮数：</label>
+                <input type="number" class="cell-input" id="train-count" style="width:100px; display:inline-block; margin-left:8px;">
+                <div class="train-tip">备注：下方填写为加速多少轮，非多少个士兵</div>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width:22%">项目</th>
+                        <th>现积分值</th>
+                        <th>数量</th>
+                        <th>获取积分</th>
+                        <th>初始值</th>
+                        <th>倍数(%)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="item-name">紫檀木</td>
+                        <td class="calc-cell" data-calc="c5-1"></td>
+                        <td><input type="number" class="cell-input" data-qty="d5-1"></td>
+                        <td class="calc-cell" data-calc="e5-1"></td>
+                        <td class="initial-cell">85</td>
+                        <td class="calc-cell" data-calc="g5-1"></td>
+                    </tr>
+                    <tr>
+                        <td class="item-name">精金</td>
+                        <td class="calc-cell" data-calc="c5-2"></td>
+                        <td><input type="number" class="cell-input" data-qty="d5-2"></td>
+                        <td class="calc-cell" data-calc="e5-2"></td>
+                        <td class="initial-cell">1700</td>
+                        <td class="calc-cell" data-calc="g5-2"></td>
+                    </tr>
+                    <tr>
+                        <td class="item-name">青金石</td>
+                        <td class="calc-cell" data-calc="c5-3"></td>
+                        <td><input type="number" class="cell-input" data-qty="d5-3"></td>
+                        <td class="calc-cell" data-calc="e5-3"></td>
+                        <td class="initial-cell">5100</td>
+                        <td class="calc-cell" data-calc="g5-3"></td>
+                    </tr>
+                    <tr>
+                        <td class="item-name">流寇</td>
+                        <td class="calc-cell" data-calc="c5-4"></td>
+                        <td><input type="number" class="cell-input" data-qty="d5-4"></td>
+                        <td class="calc-cell" data-calc="e5-4"></td>
+                        <td class="initial-cell">1500</td>
+                        <td class="calc-cell" data-calc="g5-4"></td>
+                    </tr>
+                    <tr>
+                        <td class="item-name">寨营</td>
+                        <td class="calc-cell" data-calc="c5-5"></td>
+                        <td><input type="number" class="cell-input" data-qty="d5-5"></td>
+                        <td class="calc-cell" data-calc="e5-5"></td>
+                        <td class="initial-cell">5000</td>
+                        <td class="calc-cell" data-calc="g5-5"></td>
+                    </tr>
+                    <tr>
+                        <td class="item-name">8级</td>
+                        <td class="calc-cell" data-calc="c5-6"></td>
+                        <td><input type="number" class="cell-input" data-qty="d5-6"></td>
+                        <td class="calc-cell" data-calc="e5-6"></td>
+                        <td class="initial-cell">134</td>
+                        <td class="calc-cell" data-calc="g5-6"></td>
+                    </tr>
+                    <tr>
+                        <td class="item-name">9级</td>
+                        <td class="calc-cell" data-calc="c5-7"></td>
+                        <td><input type="number" class="cell-input" data-qty="d5-7"></td>
+                        <td class="calc-cell" data-calc="e5-7"></td>
+                        <td class="initial-cell">155</td>
+                        <td class="calc-cell" data-calc="g5-7"></td>
+                    </tr>
+                    <tr>
+                        <td class="item-name">10级</td>
+                        <td class="calc-cell" data-calc="c5-8"></td>
+                        <td><input type="number" class="cell-input" data-qty="d5-8"></td>
+                        <td class="calc-cell" data-calc="e5-8"></td>
+                        <td class="initial-cell">182</td>
+                        <td class="calc-cell" data-calc="g5-8"></td>
+                    </tr>
+                    <tr>
+                        <td class="item-name">11级</td>
+                        <td class="calc-cell" data-calc="c5-9"></td>
+                        <td><input type="number" class="cell-input" data-qty="d5-9"></td>
+                        <td class="calc-cell" data-calc="e5-9"></td>
+                        <td class="initial-cell">210</td>
+                        <td class="calc-cell" data-calc="g5-9"></td>
+                    </tr>
+                    <tr>
+                        <td class="item-name">12级</td>
+                        <td class="calc-cell" data-calc="c5-10"></td>
+                        <td><input type="number" class="cell-input" data-qty="d5-10"></td>
+                        <td class="calc-cell" data-calc="e5-10"></td>
+                        <td class="initial-cell">240</td>
+                        <td class="calc-cell" data-calc="g5-10"></td>
+                    </tr>
+                    <tr>
+                        <td class="item-name">13级</td>
+                        <td class="calc-cell" data-calc="c5-11"></td>
+                        <td><input type="number" class="cell-input" data-qty="d5-11"></td>
+                        <td class="calc-cell" data-calc="e5-11"></td>
+                        <td class="initial-cell">270</td>
+                        <td class="calc-cell" data-calc="g5-11"></td>
+                    </tr>
+                    <tr>
+                        <td class="item-name">14级</td>
+                        <td class="calc-cell" data-calc="c5-12"></td>
+                        <td><input type="number" class="cell-input" data-qty="d5-12"></td>
+                        <td class="calc-cell" data-calc="e5-12"></td>
+                        <td class="initial-cell">300</td>
+                        <td class="calc-cell" data-calc="g5-12"></td>
+                    </tr>
+                    <tr>
+                        <td class="item-name">15级</td>
+                        <td class="calc-cell" data-calc="c5-13"></td>
+                        <td><input type="number" class="cell-input" data-qty="d5-13"></td>
+                        <td class="calc-cell" data-calc="e5-13"></td>
+                        <td class="initial-cell">340</td>
+                        <td class="calc-cell" data-calc="g5-13"></td>
+                    </tr>
+                    <tr class="summary-row">
+                        <td class="item-name">可获取积分</td>
+                        <td></td>
+                        <td></td>
+                        <td class="calc-cell" data-calc="sum5"></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr class="summary-row">
+                        <td class="item-name">已有积分</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td><input type="number" class="cell-input" data-qty="f5"></td>
+                        <td></td>
+                    </tr>
+                    <tr class="summary-row">
+                        <td class="item-name">总积分</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td class="calc-cell total-score" data-calc="total5"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 第六天 -->
+        <div class="tab-content" id="day6">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width:22%">项目</th>
+                        <th>现积分值</th>
+                        <th>数量</th>
+                        <th>获取积分</th>
+                        <th>初始值</th>
+                        <th>倍数(%)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="item-name">坐骑碎片</td>
+                        <td class="calc-cell" data-calc="c6-1"></td>
+                        <td><input type="number" class="cell-input" data-qty="d6-1"></td>
+                        <td class="calc-cell" data-calc="e6-1"></td>
+                        <td class="initial-cell">100000</td>
+                        <td class="calc-cell" data-calc="g6-1"></td>
+                    </tr>
+                    <tr>
+                        <td class="item-name">马具皮革</td>
+                        <td class="calc-cell" data-calc="c6-2"></td>
+                        <td><input type="number" class="cell-input" data-qty="d6-2"></td>
+                        <td class="calc-cell" data-calc="e6-2"></td>
+                        <td class="initial-cell">5000</td>
+                        <td class="calc-cell" data-calc="g6-2"></td>
+                    </tr>
+                    <tr>
+                        <td class="item-name">鎏金铜扣</td>
+                        <td class="calc-cell" data-calc="c6-3"></td>
+                        <td><input type="number" class="cell-input" data-qty="d6-3"></td>
+                        <td class="calc-cell" data-calc="e6-3"></td>
+                        <td class="initial-cell">10000</td>
+                        <td class="calc-cell" data-calc="g6-3"></td>
+                    </tr>
+                    <tr>
+                        <td class="item-name">一分钟研究</td>
+                        <td class="calc-cell" data-calc="c6-4"></td>
+                        <td><input type="number" class="cell-input" data-qty="d6-4"></td>
+                        <td class="calc-cell" data-calc="e6-4"></td>
+                        <td class="initial-cell">150</td>
+                        <td class="calc-cell" data-calc="g6-4"></td>
+                    </tr>
+                    <tr>
+                        <td class="item-name">一分钟练兵</td>
+                        <td class="calc-cell" data-calc="c6-5"></td>
+                        <td><input type="number" class="cell-input" data-qty="d6-5"></td>
+                        <td class="calc-cell" data-calc="e6-5"></td>
+                        <td class="initial-cell">150</td>
+                        <td class="calc-cell" data-calc="g6-5"></td>
+                    </tr>
+                    <tr>
+                        <td class="item-name">一分钟建筑</td>
+                        <td class="calc-cell" data-calc="c6-6"></td>
+                        <td><input type="number" class="cell-input" data-qty="d6-6"></td>
+                        <td class="calc-cell" data-calc="e6-6"></td>
+                        <td class="initial-cell">150</td>
+                        <td class="calc-cell" data-calc="g6-6"></td>
+                    </tr>
+                    <tr>
+                        <td class="item-name">金色商车</td>
+                        <td class="calc-cell" data-calc="c6-7"></td>
+                        <td><input type="number" class="cell-input" data-qty="d6-7"></td>
+                        <td class="calc-cell" data-calc="e6-7"></td>
+                        <td class="initial-cell">200000</td>
+                        <td class="calc-cell" data-calc="g6-7"></td>
+                    </tr>
+                    <tr class="summary-row">
+                        <td class="item-name">可获取积分</td>
+                        <td></td>
+                        <td></td>
+                        <td class="calc-cell" data-calc="sum6"></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr class="summary-row">
+                        <td class="item-name">已有积分</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td><input type="number" class="cell-input" data-qty="f6"></td>
+                        <td></td>
+                    </tr>
+                    <tr class="summary-row">
+                        <td class="item-name">总积分</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td class="calc-cell total-score" data-calc="total6"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="note">
+            <strong>说明：</strong><br>
+            1. 黄色背景的单元格可以编辑，灰色单元格为自动计算结果<br>
+            2. 顶部全局加成修改后，所有天数的积分会自动重新计算<br>
+            3. 现积分值 = 初始值 × (1 + 倍数%)<br>
+            4. 获取积分 = 现积分值 × 数量 × 额外乘数（采集食物木材×10、煤×20、铁×40、练兵等级×单次练兵轮数）<br>
+            5. 总积分 = 已有积分 + 可获取积分<br>
+            6. 所有输入数据自动本地保存，关闭/刷新页面下次打开自动恢复上次填写内容
+        </div>
+    </div>
+
+    <script>
+        // 本地存储前缀，防止和其他页面冲突
+        const STORAGE_KEY_PREFIX = "scoreCalc_";
+
+        // 加成类型
+        const BONUS = {
+            BASE: 'base',       // 孙策 + 通用非元宝
+            SPEED: 'speed',     // + 通用加速
+            SHANGCHE: 'shangche', // + 商车
+            FENGHUO: 'fenghuo', // + 烽火
+            ZHAOMU: 'zhaomu',   // + 招募
+            LIANBING: 'lianbing' // + 练兵
+        };
+
+        // 每天的项目配置：初始值, 加成类型, 额外乘数
+        const dayConfig = {
+            1: [
+                { name: '消耗武器通用', init: 10000, bonus: BONUS.BASE, mult: 1 },
+                { name: '装备锻造', init: 10000, bonus: BONUS.BASE, mult: 1 },
+                { name: '烽火台', init: 25000, bonus: BONUS.FENGHUO, mult: 1 },
+                { name: '采集1000食物', init: 10, bonus: BONUS.BASE, mult: 10 },
+                { name: '采集1000木材', init: 10, bonus: BONUS.BASE, mult: 10 },
+                { name: '500煤', init: 10, bonus: BONUS.BASE, mult: 20 },
+                { name: '250铁', init: 10, bonus: BONUS.BASE, mult: 40 },
+            ],
+            2: [
+                { name: '乾坤寻将', init: 35000, bonus: BONUS.BASE, mult: 1 },
+                { name: '普通招募', init: 800, bonus: BONUS.ZHAOMU, mult: 1 },
+                { name: '高级招募', init: 2500, bonus: BONUS.ZHAOMU, mult: 1 },
+                { name: '蓝色碎片', init: 800, bonus: BONUS.BASE, mult: 1 },
+                { name: '紫色碎片', init: 2500, bonus: BONUS.BASE, mult: 1 },
+                { name: '橙色碎片', init: 6000, bonus: BONUS.BASE, mult: 1 },
+            ],
+            3: [
+                { name: '转运符', init: 4000, bonus: BONUS.BASE, mult: 1 },
+                { name: '璞玉', init: 5000, bonus: BONUS.BASE, mult: 1 },
+                { name: '琢玉刀', init: 25000, bonus: BONUS.BASE, mult: 1 },
+                { name: '汉白玉', init: 20000, bonus: BONUS.BASE, mult: 1 },
+                { name: '1min建筑', init: 150, bonus: BONUS.SPEED, mult: 1 },
+                { name: '回收普通', init: 2000, bonus: BONUS.BASE, mult: 1 },
+                { name: '回收精良', init: 5000, bonus: BONUS.BASE, mult: 1 },
+                { name: '回收稀有', init: 30000, bonus: BONUS.BASE, mult: 1 },
+                { name: '回收史诗', init: 200000, bonus: BONUS.BASE, mult: 1 },
+                { name: '金色商车', init: 200000, bonus: BONUS.SHANGCHE, mult: 1 },
+            ],
+            4: [
+                { name: '锻造石', init: 10000, bonus: BONUS.BASE, mult: 1 },
+                { name: '研究加速', init: 150, bonus: BONUS.SPEED, mult: 1 },
+                { name: '六稻图', init: 100, bonus: BONUS.BASE, mult: 1 },
+                { name: '烽火台', init: 25000, bonus: BONUS.FENGHUO, mult: 1 },
+            ],
+            5: [
+                { name: '紫檀木', init: 85, bonus: BONUS.BASE, mult: 1 },
+                { name: '精金', init: 1700, bonus: BONUS.BASE, mult: 1 },
+                { name: '青金石', init: 5100, bonus: BONUS.BASE, mult: 1 },
+                { name: '流寇', init: 1500, bonus: BONUS.BASE, mult: 1 },
+                { name: '寨营', init: 5000, bonus: BONUS.BASE, mult: 1 },
+                { name: '8级', init: 134, bonus: BONUS.LIANBING, mult: 'train' },
+                { name: '9级', init: 155, bonus: BONUS.LIANBING, mult: 'train' },
+                { name: '10级', init: 182, bonus: BONUS.LIANBING, mult: 'train' },
+                { name: '11级', init: 210, bonus: BONUS.LIANBING, mult: 'train' },
+                { name: '12级', init: 240, bonus: BONUS.LIANBING, mult: 'train' },
+                { name: '13级', init: 270, bonus: BONUS.LIANBING, mult: 'train' },
+                { name: '14级', init: 300, bonus: BONUS.LIANBING, mult: 'train' },
+                { name: '15级', init: 340, bonus: BONUS.LIANBING, mult: 'train' },
+            ],
+            6: [
+                { name: '坐骑碎片', init: 100000, bonus: BONUS.BASE, mult: 1 },
+                { name: '马具皮革', init: 5000, bonus: BONUS.BASE, mult: 1 },
+                { name: '鎏金铜扣', init: 10000, bonus: BONUS.BASE, mult: 1 },
+                { name: '一分钟研究', init: 150, bonus: BONUS.SPEED, mult: 1 },
+                { name: '一分钟练兵', init: 150, bonus: BONUS.SPEED, mult: 1 },
+                { name: '一分钟建筑', init: 150, bonus: BONUS.SPEED, mult: 1 },
+                { name: '金色商车', init: 200000, bonus: BONUS.SHANGCHE, mult: 1 },
+            ]
+        };
+
+        // 获取存储key
+        function getStoreKey(id) {
+            return STORAGE_KEY_PREFIX + id;
+        }
+        // 保存输入值到本地存储
+        function saveInput(el) {
+            const key = getStoreKey(el.id || el.dataset.qty);
+            localStorage.setItem(key, el.value);
+        }
+        // 读取本地存储回填输入框
+        function loadInput(el, defaultVal = "") {
+            const key = getStoreKey(el.id || el.dataset.qty);
+            const val = localStorage.getItem(key);
+            if (val !== null && val !== "") {
+                el.value = val;
+            } else {
+                el.value = defaultVal;
+            }
+        }
+
+        // 获取当前加成值
+        function getBonus(type) {
+            const sunce = parseFloat(document.getElementById('bonus-sunce').value) || 0;
+            const feiyuanbao = parseFloat(document.getElementById('bonus-feiyuanbao').value) || 0;
+            let base = sunce + feiyuanbao;
+            
+            switch(type) {
+                case BONUS.BASE: return base;
+                case BONUS.SPEED: return base + (parseFloat(document.getElementById('bonus-jiasu').value) || 0);
+                case BONUS.SHANGCHE: return base + (parseFloat(document.getElementById('bonus-shangche').value) || 0);
+                case BONUS.FENGHUO: return base + (parseFloat(document.getElementById('bonus-fenghuo').value) || 0);
+                case BONUS.ZHAOMU: return base + (parseFloat(document.getElementById('bonus-zhaomu').value) || 0);
+                case BONUS.LIANBING: return base + (parseFloat(document.getElementById('bonus-lianbing').value) || 0);
+                default: return base;
+            }
+        }
+
+        // 获取练兵轮数
+        function getTrainCount() {
+            return parseFloat(document.getElementById('train-count').value) || 0;
+        }
+
+        // 格式化数字
+        function formatNum(num) {
+            if (num === 0) return '0';
+            if (Number.isInteger(num)) return num.toLocaleString();
+            return num.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        }
+
+        // 重新计算所有
+        function recalcAll() {
+            for (let day = 1; day <= 6; day++) {
+                const items = dayConfig[day];
+                let sum = 0;
+                
+                items.forEach((item, idx) => {
+                    const i = idx + 1;
+                    const bonus = getBonus(item.bonus);
+                    const currentScore = item.init * (1 + bonus / 100);
+                    const qty = parseFloat(document.querySelector(`[data-qty="d${day}-${i}"]`).value) || 0;
+                    
+                    let mult = item.mult;
+                    if (mult === 'train') mult = getTrainCount();
+                    
+                    const earned = currentScore * qty * mult;
+                    sum += earned;
+                    
+                    document.querySelector(`[data-calc="c${day}-${i}"]`).textContent = formatNum(currentScore);
+                    document.querySelector(`[data-calc="e${day}-${i}"]`).textContent = formatNum(earned);
+                    document.querySelector(`[data-calc="g${day}-${i}"]`).textContent = bonus.toFixed(1);
+                });
+                
+                const existing = parseFloat(document.querySelector(`[data-qty="f${day}"]`).value) || 0;
+                document.querySelector(`[data-calc="sum${day}"]`).textContent = formatNum(sum);
+                document.querySelector(`[data-calc="total${day}"]`).textContent = formatNum(sum + existing);
+            }
+        }
+
+        // Tab 切换
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                const day = this.dataset.day;
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                this.classList.add('active');
+                document.getElementById('day' + day).classList.add('active');
+            });
+        });
+
+        // 初始化：加载本地存储 + 绑定事件
+        function init() {
+            const allInputs = document.querySelectorAll('input[type="number"].cell-input');
+            // 回填本地存储数据
+            allInputs.forEach(input => {
+                let def = "";
+                // 全局加成默认值
+                if(input.id === "bonus-sunce") def = "30";
+                if(input.id === "bonus-jiasu") def = "55";
+                if(input.id === "bonus-feiyuanbao") def = "27.5";
+                if(input.id === "bonus-shangche") def = "58";
+                if(input.id === "bonus-fenghuo") def = "64";
+                if(input.id === "bonus-zhaomu") def = "52";
+                if(input.id === "bonus-lianbing") def = "52";
+                if(input.id === "train-count") def = "801";
+                if(input.dataset.qty === "f1") def = "13808336";
+                loadInput(input, def);
+
+                // 输入时自动保存并重算
+                input.addEventListener('input', function(){
+                    saveInput(this);
+                    recalcAll();
+                });
+            });
+            recalcAll();
+        }
+        init();
+    </script>
+</body>
+</html>
