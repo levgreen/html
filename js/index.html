@@ -1,1 +1,785 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>综合计算工具</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft YaHei", sans-serif;
+        }
 
+        .tab-bar {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .tab {
+            padding: 10px 30px;
+            border-radius: 8px;
+            background: #e8edf5;
+            cursor: pointer;
+            font-size: 16px;
+            transition: 0.2s;
+        }
+        .tab.active {
+            background: #409eff;
+            color: #fff;
+        }
+
+        .page {
+            display: none;
+        }
+        .page.active {
+            display: block;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            padding: 30px;
+            max-width: 720px;
+            margin: 0 auto;
+        }
+        .title {
+            text-align: center;
+            color: #333;
+            margin-bottom: 25px;
+            font-size: 24px;
+        }
+        .calc-box {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .config-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 18px;
+            justify-content: center;
+        }
+        .config-btn {
+            padding: 6px 10px;
+            font-size: 13px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background: #6c757d;
+            color: white;
+        }
+        .save-btn { background: #28a745; color: white; }
+        .rename-btn { background: #ffc107; color:#333; }
+        .export-btn { background: #17a2b8; color: white; }
+        .import-btn { background: #fd7e14; color: white; }
+        .unit-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 16px;
+            font-size: 16px;
+            gap: 8px;
+        }
+        .unit-name {
+            width: 70px;
+            font-weight: bold;
+            color: #444;
+        }
+        .time-input {
+            padding: 6px 9px;
+            font-size: 14px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .end-time-wrap{
+            margin: 20px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        button {
+            flex: 1;
+            padding: 9px;
+            font-size: 15px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .btn-calc { background-color: #409eff; color: white; }
+        .btn-clear { background-color: #6c757d; color: white; }
+        .result-box {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e9f7ff;
+            border-radius: 6px;
+            font-size: 16px;
+            line-height: 1.7;
+            color: #0056b3;
+            display: none;
+        }
+
+        .material-body {
+            background: linear-gradient(135deg, #f0f4f8, #e6edf7);
+            padding: 0;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+        .material-container {
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(30, 60, 100, 0.12);
+            padding: 35px;
+        }
+        .material-title {
+            text-align: center;
+            font-size: 24px;
+            color: #2c3e50;
+            margin-bottom: 25px;
+            font-weight: 600;
+        }
+        .main-layout {
+            display: flex;
+            gap: 25px;
+            margin-bottom: 30px;
+            align-items: flex-start;
+            justify-content: center;
+        }
+        .mode-box {
+            display: flex;
+            justify-content: center;
+            gap: 22px;
+            margin-bottom: 22px;
+        }
+        .mode-btn {
+            padding: 12px 32px;
+            border-radius: 30px;
+            border: none;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #e8edf5;
+            color: #445566;
+        }
+        .mode-btn.active {
+            background: linear-gradient(90deg, #40c972, #2fb860);
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(64, 201, 114, 0.35);
+        }
+        .panel-card {
+            background: #f7f9fc;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 0;
+            flex: 1;
+        }
+        .card-tip {
+            font-size: 16px;
+            color: #2d3748;
+            font-weight: 500;
+            margin-bottom: 18px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #dde3ec;
+        }
+        .mat-item {
+            display: block;
+            margin: 12px 0;
+            font-size: 15px;
+        }
+        .fast-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 15px 0;
+            font-size: 15px;
+        }
+        .time-box {
+            width: 300px;
+        }
+        .form-item {
+            margin: 18px 0;
+        }
+        .form-label {
+            display: block;
+            font-size: 14px;
+            color: #505965;
+            margin-bottom: 8px;
+        }
+        input[type="text"],
+        input[type="date"],
+        select {
+            width: 160px;
+            height: 38px;
+            padding: 0 12px;
+            border: 1px solid #cbd5e0;
+            border-radius: 8px;
+            outline: none;
+        }
+        input:focus, select:focus {
+            border-color: #40c972;
+        }
+        .calc-btn {
+            width: 100%;
+            height: 44px;
+            margin-top: 12px;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(90deg, #40c972, #2fb860);
+            color: #fff;
+            font-size: 15px;
+            cursor: pointer;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 12px;
+        }
+        th {
+            background: #40c972;
+            color: #fff;
+            padding: 12px 8px;
+            font-size: 14px;
+        }
+        td {
+            padding: 11px 8px;
+            font-size: 13px;
+            text-align: center;
+            border-bottom: 1px solid #edf2f7;
+        }
+        tr:nth-child(even) td {
+            background: #f8fafc;
+        }
+        .hide { display: none; }
+        .flex-row {
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+            width: 100%;
+        }
+        /* ==============================================
+   手机屏幕自适应适配（电脑端不变，手机自动优化）
+   ============================================== */
+        @media (max-width: 768px) {
+          /* 全局 */
+          body {
+            padding: 15px 10px !important;
+            max-width: 100% !important;
+          }
+
+          /* 标签栏 */
+          .tab-bar {
+            gap: 10px !important;
+            flex-wrap: wrap !important;
+          }
+          .tab {
+            padding: 8px 16px !important;
+            font-size: 14px !important;
+          }
+
+          /* 练兵工具 - 手机适配 */
+          #train-page .calc-box {
+            padding: 18px 14px !important;
+          }
+          #train-page .unit-item {
+            flex-wrap: wrap !important;
+            gap: 6px !important;
+          }
+          #train-page .time-input {
+            width: 100% !important;
+          }
+          #train-page .btn-group {
+            flex-direction: column !important;
+            gap: 8px !important;
+          }
+          #train-page .config-row {
+            justify-content: flex-start !important;
+          }
+
+          /* 材料采集 - 手机自动竖排 */
+          .material-container {
+            padding: 20px 14px !important;
+          }
+          .main-layout {
+            flex-direction: column !important;
+            gap: 20px !important;
+          }
+          .flex-row {
+            flex-direction: column !important;
+            gap: 20px !important;
+          }
+          .material-box,
+          .time-box {
+            width: 100% !important;
+          }
+          .panel-card {
+            width: 100% !important;
+            margin-bottom: 10px !important;
+          }
+          .mode-btn {
+            padding: 10px 20px !important;
+            font-size: 14px !important;
+          }
+          .fast-row {
+            gap: 8px !important;
+            flex-wrap: wrap !important;
+          }
+          input[type="text"],
+          input[type="date"],
+          select {
+            width: 110px !important;
+            flex-shrink: 0 !important;
+          }
+          table {
+            display: block !important;
+            overflow-x: auto !important;
+          }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="tab-bar">
+        <div class="tab active" onclick="switchPage('train')">练兵时间计算</div>
+        <div class="tab" onclick="switchPage('material')">材料采集计算</div>
+    </div>
+
+    <div class="page active" id="train-page">
+        <h1 class="title">兵种时间计算工具</h1>
+        <div class="calc-box">
+            <div class="config-row">
+                <button class="config-btn" onclick="loadTrainConfig(1)">配置1</button>
+                <button class="config-btn" onclick="loadTrainConfig(2)">配置2</button>
+                <button class="config-btn" onclick="loadTrainConfig(3)">配置3</button>
+                <button class="config-btn" onclick="loadTrainConfig(4)">配置4</button>
+                <button class="config-btn" onclick="loadTrainConfig(5)">配置5</button>
+                <button class="config-btn" onclick="loadTrainConfig(6)">配置6</button>
+                <button class="config-btn save-btn" onclick="saveCurrentTrainConfig()">保存</button>
+                <button class="config-btn rename-btn" onclick="renameTrainConfig()">重命名</button>
+                <button class="config-btn export-btn" onclick="exportTrainConfig()">导出</button>
+                <button class="config-btn import-btn" onclick="importTrainConfig()">导入</button>
+            </div>
+
+            <div class="unit-item">
+                <span class="unit-name">步兵</span>
+                <input type="checkbox" id="infantryCheck">
+                <span>三倍耗时</span>
+                <input type="time" step="1" class="time-input" id="infantry">
+            </div>
+            <div class="unit-item">
+                <span class="unit-name">骑兵</span>
+                <input type="checkbox" id="cavalryCheck">
+                <span>三倍耗时</span>
+                <input type="time" step="1" class="time-input" id="cavalry">
+            </div>
+            <div class="unit-item">
+                <span class="unit-name">弓兵</span>
+                <input type="checkbox" id="archerCheck">
+                <span>三倍耗时</span>
+                <input type="time" step="1" class="time-input" id="archer">
+            </div>
+
+            <div class="end-time-wrap">
+                <p style="margin-bottom:10px;font-weight:bold">训练统一结束时间</p>
+                <input type="datetime-local" class="time-input" id="endTime">
+            </div>
+
+            <div class="btn-group">
+                <button class="btn-calc" onclick="calcAllTime()">计算各兵种开始时间</button>
+                <button class="btn-clear" onclick="clearAllTrain()">清空重置</button>
+            </div>
+
+            <div class="result-box" id="train-result">
+                <div id="resultText"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="page" id="material-page">
+        <div class="material-body">
+            <div class="material-container">
+                <h2 class="material-title">材料采集计算器</h2>
+
+                <div class="config-row">
+                    <button class="config-btn" onclick="loadMaterialConfig(1)">配置1</button>
+                    <button class="config-btn" onclick="loadMaterialConfig(2)">配置2</button>
+                    <button class="config-btn" onclick="loadMaterialConfig(3)">配置3</button>
+                    <button class="config-btn" onclick="loadMaterialConfig(4)">配置4</button>
+                    <button class="config-btn" onclick="loadMaterialConfig(5)">配置5</button>
+                    <button class="config-btn" onclick="loadMaterialConfig(6)">配置6</button>
+                    <button class="config-btn save-btn" onclick="saveCurrentMaterialConfig()">保存</button>
+                    <button class="config-btn rename-btn" onclick="renameMaterialConfig()">重命名</button>
+                    <button class="config-btn export-btn" onclick="exportMaterialConfig()">导出</button>
+                    <button class="config-btn import-btn" onclick="importMaterialConfig()">导入</button>
+                </div>
+
+                <div class="main-layout">
+                    <div class="material-box">
+                        <div class="mode-box">
+                            <button class="mode-btn active" id="normalBtn">普通计算</button>
+                            <button class="mode-btn" id="fastBtn">快捷计算</button>
+                        </div>
+
+                        <div class="flex-row">
+                            <div id="normalSection" class="panel-card">
+                                <div class="card-tip">选择材料类型</div>
+                                <label class="mat-item"><input type="radio" name="mat" value="肉" checked>肉</label>
+                                <label class="mat-item"><input type="radio" name="mat" value="木">木</label>
+                                <label class="mat-item"><input type="radio" name="mat" value="煤">煤</label>
+                                <label class="mat-item"><input type="radio" name="mat" value="铁">铁</label>
+                            </div>
+
+                            <div id="fastSection" class="panel-card hide">
+                                <div class="fast-row"><span>肉</span><input id="meatSpeed"><input type="checkbox" id="meatDouble">双倍</div>
+                                <div class="fast-row"><span>木</span><input id="woodSpeed"><input type="checkbox" id="woodDouble">双倍</div>
+                                <div class="fast-row"><span>煤</span><input id="coalSpeed"><input type="checkbox" id="coalDouble">双倍</div>
+                                <div class="fast-row"><span>铁</span><input id="ironSpeed"><input type="checkbox" id="ironDouble">双倍</div>
+                            </div>
+
+                            <div class="time-box">
+                                <div class="panel-card">
+                                    <div class="form-item">
+                                        <label class="mat-item"><input type="checkbox" id="doubleSpeed"> 双倍采集速率</label>
+                                    </div>
+                                    <div class="form-item">
+                                        <label class="form-label">每小时采集速度</label>
+                                        <input id="speed">
+                                    </div>
+                                    <div class="form-item">
+                                        <label class="form-label">采集结束时间</label>
+                                        <input type="date" id="endDate">
+                                        <select id="endH"></select>
+                                        <select id="endM"></select>
+                                    </div>
+                                    <button class="calc-btn" onclick="calcMaterialAll()">开始计算</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <table id="resultTable">
+                    <thead></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+<script>
+function switchPage(page) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.getElementById(page + '-page').classList.add('active');
+    event.target.classList.add('active');
+}
+
+const TRAIN_PREFIX = "train_";
+window.onload = function(){
+    loadTrainStorage();
+    bindTrainAutoSave();
+    refreshTrainButtons();
+    initMaterialPage();
+    loadMaterialAuto();
+};
+
+function saveCurrentTrainConfig() {
+    let slot = prompt("保存到配置（输入1-6）","1");
+    if(!slot||isNaN(slot)||slot<1||slot>6){alert("输入1-6");return;}
+    let data = {
+        name: localStorage.getItem(TRAIN_PREFIX+"config_name_"+slot)||"配置"+slot,
+        infantry:document.getElementById("infantry").value,
+        infantryCheck:document.getElementById("infantryCheck").checked,
+        cavalry:document.getElementById("cavalry").value,
+        cavalryCheck:document.getElementById("cavalryCheck").checked,
+        archer:document.getElementById("archer").value,
+        archerCheck:document.getElementById("archerCheck").checked,
+        endTime:document.getElementById("endTime").value
+    };
+    localStorage.setItem(TRAIN_PREFIX+"userConfig_"+slot,JSON.stringify(data));
+    alert("已保存");
+    refreshTrainButtons();
+}
+function loadTrainConfig(num){
+    let d=localStorage.getItem(TRAIN_PREFIX+"userConfig_"+num);
+    if(!d){alert("空");return;}d=JSON.parse(d);
+    document.getElementById("infantry").value=d.infantry||"";
+    document.getElementById("infantryCheck").checked=d.infantryCheck;
+    document.getElementById("cavalry").value=d.cavalry||"";
+    document.getElementById("cavalryCheck").checked=d.cavalryCheck;
+    document.getElementById("archer").value=d.archer||"";
+    document.getElementById("archerCheck").checked=d.archerCheck;
+    document.getElementById("endTime").value=d.endTime||"";
+    saveTrainStorage();
+    alert("已加载："+(d.name||"配置"+num));
+}
+function renameTrainConfig(){
+    let s=prompt("编号1-6","1");
+    if(!s||isNaN(s)||s<1||s>6)return;
+    let o=localStorage.getItem(TRAIN_PREFIX+"config_name_"+s)||"配置"+s;
+    let n=prompt("新名称",o);
+    if(n)localStorage.setItem(TRAIN_PREFIX+"config_name_"+s,n);
+    refreshTrainButtons();
+}
+function exportTrainConfig(){
+    let o={};
+    for(let i=1;i<=6;i++){
+        o[TRAIN_PREFIX+"userConfig_"+i]=localStorage.getItem(TRAIN_PREFIX+"userConfig_"+i);
+        o[TRAIN_PREFIX+"config_name_"+i]=localStorage.getItem(TRAIN_PREFIX+"config_name_"+i);
+    }
+    prompt("导出",JSON.stringify(o,null,2));
+}
+function importTrainConfig(){
+    let t=prompt("导入");
+    if(!t)return;
+    try{
+        let d=JSON.parse(t);
+        for(let k in d)if(d[k])localStorage.setItem(k,d[k]);
+        alert("成功");location.reload();
+    }catch(e){alert("失败");}
+}
+function refreshTrainButtons(){
+    let bs=document.querySelectorAll("#train-page .config-btn");
+    for(let i=1;i<=6;i++){
+        let n=localStorage.getItem(TRAIN_PREFIX+"config_name_"+i)||"配置"+i;
+        bs[i-1].innerText=n;
+    }
+}
+function loadTrainStorage(){
+    let iCheck=localStorage.getItem('infantryCheck')==='true';
+    let cCheck=localStorage.getItem('cavalryCheck')==='true';
+    let aCheck=localStorage.getItem('archerCheck')==='true';
+    let iTime=localStorage.getItem('infantryTime');
+    let cTime=localStorage.getItem('cavalryTime');
+    let aTime=localStorage.getItem('archerTime');
+    let end=localStorage.getItem('endTime');
+    document.getElementById('infantryCheck').checked=iCheck;
+    document.getElementById('cavalryCheck').checked=cCheck;
+    document.getElementById('archerCheck').checked=aCheck;
+    if(iTime)document.getElementById('infantry').value=iTime;
+    if(cTime)document.getElementById('cavalry').value=cTime;
+    if(aTime)document.getElementById('archer').value=aTime;
+    if(end)document.getElementById('endTime').value=end;
+    else{
+        let now=new Date();
+        let def=now.getFullYear()+"-"+String(now.getMonth()+1).padStart(2,'0')+"-"+String(now.getDate()).padStart(2,'0')+"T00:00";
+        document.getElementById('endTime').value=def;
+    }
+}
+function bindTrainAutoSave(){
+    let arr=['infantryCheck','cavalryCheck','archerCheck','infantry','cavalry','archer','endTime'];
+    arr.forEach(id=>{
+        let el=document.getElementById(id);
+        if(el)el.addEventListener('change',saveTrainStorage);
+    });
+}
+function saveTrainStorage(){
+    localStorage.setItem('infantryCheck',document.getElementById('infantryCheck').checked);
+    localStorage.setItem('cavalryCheck',document.getElementById('cavalryCheck').checked);
+    localStorage.setItem('archerCheck',document.getElementById('archerCheck').checked);
+    localStorage.setItem('infantryTime',document.getElementById('infantry').value);
+    localStorage.setItem('cavalryTime',document.getElementById('cavalry').value);
+    localStorage.setItem('archerTime',document.getElementById('archer').value);
+    localStorage.setItem('endTime',document.getElementById('endTime').value);
+}
+function timeToSeconds(s){if(!s)return 0;let[h,m,sd]=s.split(':').map(Number);return h*3600+m*60+(sd||0);}
+function formatTime(d){
+    return d.getFullYear()+"-"+
+           String(d.getMonth()+1).padStart(2,'0')+"-"+
+           String(d.getDate()).padStart(2,'0')+" "+
+           String(d.getHours()).padStart(2,'0')+":"+
+           String(d.getMinutes()).padStart(2,'0')+":"+
+           String(d.getSeconds()).padStart(2,'0');
+}
+function secToDiff(sec){
+    let total = Math.round(Math.abs(sec));
+    let h = Math.floor(total / 3600);
+    let m = Math.floor((total % 3600) / 60);
+    let s = total % 60;
+    return (sec >= 0 ? "已过去" : "还有") + ` ${h}时${m}分${s}秒`;
+}
+function calcAllTime(){
+    let inf=timeToSeconds(document.getElementById("infantry").value);
+    let cav=timeToSeconds(document.getElementById("cavalry").value);
+    let arc=timeToSeconds(document.getElementById("archer").value);
+    if(document.getElementById("infantryCheck").checked)inf*=3;
+    if(document.getElementById("cavalryCheck").checked)cav*=3;
+    if(document.getElementById("archerCheck").checked)arc*=3;
+    let endV=document.getElementById("endTime").value;
+    if(!endV){alert("请选结束时间");return;}
+    let end=new Date(endV).getTime();
+    let now=Date.now();
+    let iS=end-inf*1000,cS=end-cav*1000,aS=end-arc*1000;
+    document.getElementById("resultText").innerHTML=
+        `步兵时长：${Math.floor(inf/3600)}时${Math.floor((inf%3600)/60)}分<br>开始：${formatTime(new Date(iS))}<br>${secToDiff((now-iS)/1000)}<br><br>`+
+        `骑兵时长：${Math.floor(cav/3600)}时${Math.floor((cav%3600)/60)}分<br>开始：${formatTime(new Date(cS))}<br>${secToDiff((now-cS)/1000)}<br><br>`+
+        `弓兵时长：${Math.floor(arc/3600)}时${Math.floor((arc%3600)/60)}分<br>开始：${formatTime(new Date(aS))}<br>${secToDiff((now-aS)/1000)}`;
+    document.getElementById("train-result").style.display="block";
+}
+function clearAllTrain(){
+    document.getElementById("infantry").value="";
+    document.getElementById("cavalry").value="";
+    document.getElementById("archer").value="";
+    document.getElementById("infantryCheck").checked=false;
+    document.getElementById("cavalryCheck").checked=false;
+    document.getElementById("archerCheck").checked=false;
+    let now=new Date();
+    let def=now.getFullYear()+"-"+String(now.getMonth()+1).padStart(2,'0')+"-"+String(now.getDate()).padStart(2,'0')+"T00:00";
+    document.getElementById("endTime").value=def;
+    document.getElementById("train-result").style.display="none";
+    refreshTrainButtons();
+}
+
+const MAT_PREFIX = "material_";
+function initMaterialPage(){
+    for(let i=0;i<24;i++)endH.innerHTML+=`<option>${String(i).padStart(2,0)}</option>`;
+    for(let i=0;i<60;i++)endM.innerHTML+=`<option>${String(i).padStart(2,0)}</option>`;
+    normalBtn.onclick=()=>{
+        normalSection.classList.remove("hide");
+        fastSection.classList.add("hide");
+        speed.disabled=false;
+        doubleSpeed.disabled=false;
+        normalBtn.classList.add("active");
+        fastBtn.classList.remove("active");
+        saveMaterialAuto();
+    };
+    fastBtn.onclick=()=>{
+        normalSection.classList.add("hide");
+        fastSection.classList.remove("hide");
+        speed.disabled=true;
+        doubleSpeed.disabled=true;
+        fastBtn.classList.add("active");
+        normalBtn.classList.remove("active");
+        saveMaterialAuto();
+    };
+    bindMaterialAutoSave();
+    refreshMaterialButtons();
+}
+function saveMaterialAuto(){
+    let d={
+        mode:normalBtn.classList.contains("active")?"normal":"fast",
+        mat:document.querySelector('input[name="mat"]:checked')?.value,
+        speed:speed.value,double:doubleSpeed.checked,
+        meatSpeed:meatSpeed.value,meatDouble:meatDouble.checked,
+        woodSpeed:woodSpeed.value,woodDouble:woodDouble.checked,
+        coalSpeed:coalSpeed.value,coalDouble:coalDouble.checked,
+        ironSpeed:ironSpeed.value,ironDouble:ironDouble.checked,
+        endDate:endDate.value,endH:endH.value,endM:endM.value
+    };
+    localStorage.setItem(MAT_PREFIX+"auto",JSON.stringify(d));
+}
+function loadMaterialAuto(){
+    let r=localStorage.getItem(MAT_PREFIX+"auto");
+    if(!r)return;let d=JSON.parse(r);
+    if(d.mode==="fast")fastBtn.click();else normalBtn.click();
+    if(d.mat){let e=document.querySelector(`input[name="mat"][value="${d.mat}"]`);if(e)e.checked=true;}
+    speed.value=d.speed||"";doubleSpeed.checked=!!d.double;
+    meatSpeed.value=d.meatSpeed||"";woodSpeed.value=d.woodSpeed||"";coalSpeed.value=d.coalSpeed||"";ironSpeed.value=d.ironSpeed||"";
+    meatDouble.checked=!!d.meatDouble;woodDouble.checked=!!d.woodDouble;coalDouble.checked=!!d.coalDouble;ironDouble.checked=!!d.ironDouble;
+    endDate.value=d.endDate||"";endH.value=d.endH||"00";endM.value=d.endM||"00";
+}
+function bindMaterialAutoSave(){
+    let arr=['doubleSpeed','speed','endDate','endH','endM','meatSpeed','meatDouble','woodSpeed','woodDouble','coalSpeed','coalDouble','ironSpeed','ironDouble'];
+    arr.forEach(id=>{let e=document.getElementById(id);if(e)e.addEventListener('change',saveMaterialAuto);});
+    document.querySelectorAll('input[name="mat"]').forEach(r=>r.addEventListener('change',saveMaterialAuto));
+}
+function saveCurrentMaterialConfig(){
+    let s=prompt("保存到1-6","1");
+    if(!s||isNaN(s)||s<1||s>6){alert("1-6");return;}
+    let d={
+        name:localStorage.getItem(MAT_PREFIX+"config_name_"+s)||"配置"+s,
+        mode:normalBtn.classList.contains("active")?"normal":"fast",
+        mat:document.querySelector('input[name="mat"]:checked')?.value,
+        speed:speed.value,double:doubleSpeed.checked,
+        meatSpeed:meatSpeed.value,meatDouble:meatDouble.checked,
+        woodSpeed:woodSpeed.value,woodDouble:woodDouble.checked,
+        coalSpeed:coalSpeed.value,coalDouble:coalDouble.checked,
+        ironSpeed:ironSpeed.value,ironDouble:ironDouble.checked,
+        endDate:endDate.value,endH:endH.value,endM:endM.value
+    };
+    localStorage.setItem(MAT_PREFIX+"userConfig_"+s,JSON.stringify(d));
+    alert("已保存");refreshMaterialButtons();
+}
+function loadMaterialConfig(n){
+    let d=localStorage.getItem(MAT_PREFIX+"userConfig_"+n);
+    if(!d){alert("空");return;}d=JSON.parse(d);
+    d.mode==="fast"?fastBtn.click():normalBtn.click();
+    if(d.mat){let e=document.querySelector(`input[name="mat"][value="${d.mat}"]`);if(e)e.checked=true;}
+    speed.value=d.speed||"";doubleSpeed.checked=!!d.double;
+    meatSpeed.value=d.meatSpeed||"";woodSpeed.value=d.woodSpeed||"";coalSpeed.value=d.coalSpeed||"";ironSpeed.value=d.ironSpeed||"";
+    meatDouble.checked=!!d.meatDouble;woodDouble.checked=!!d.woodDouble;coalDouble.checked=!!d.coalDouble;ironDouble.checked=!!d.ironDouble;
+    endDate.value=d.endDate||"";endH.value=d.endH||"00";endM.value=d.endM||"00";
+    saveMaterialAuto();
+    alert("已加载："+(d.name||"配置"+n));
+}
+function renameMaterialConfig(){
+    let s=prompt("编号1-6","1");
+    if(!s||isNaN(s)||s<1||s>6)return;
+    let o=localStorage.getItem(MAT_PREFIX+"config_name_"+s)||"配置"+s;
+    let n=prompt("新名称",o);
+    if(n)localStorage.setItem(MAT_PREFIX+"config_name_"+s,n);
+    refreshMaterialButtons();
+}
+function exportMaterialConfig(){
+    let o={};
+    for(let i=1;i<=6;i++){
+        o[MAT_PREFIX+"userConfig_"+i]=localStorage.getItem(MAT_PREFIX+"userConfig_"+i);
+        o[MAT_PREFIX+"config_name_"+i]=localStorage.getItem(MAT_PREFIX+"config_name_"+i);
+    }
+    prompt("导出",JSON.stringify(o,null,2));
+}
+function importMaterialConfig(){
+    let t=prompt("导入");
+    if(!t)return;
+    try{
+        let d=JSON.parse(t);
+        for(let k in d)if(d[k])localStorage.setItem(k,d[k]);
+        alert("成功");location.reload();
+    }catch(e){alert("失败");}
+}
+function refreshMaterialButtons(){
+    let bs=document.querySelectorAll("#material-page .config-btn");
+    for(let i=1;i<=6;i++){
+        let n=localStorage.getItem(MAT_PREFIX+"config_name_"+i)||"配置"+i;
+        bs[i-1].innerText=n;
+    }
+}
+function calcOne(mat,v,d){
+    if(!v)return null;let s=parseFloat(v);if(d)s*=2;let r=1;if(mat=="煤")r=0.5;if(mat=="铁")r=0.25;
+    let end=new Date(`${endDate.value} ${endH.value}:${endM.value}`);let a=[];
+    for(let lv=1;lv<=8;lv++){let t=1200000*lv*r;let h=t/s;let st=new Date(end.getTime()-h*3600000);
+    a.push({lv,total:t,time:`${Math.floor(h)}时${Math.round((h-Math.floor(h))*60)}分`,start:`${st.getMonth()+1}-${st.getDate()} ${String(st.getHours()).padStart(2,0)}:${String(st.getMinutes()).padStart(2,0)}`});}
+    return a;
+}
+function calcMaterialAll(){
+    let t=resultTable;t.tHead.innerHTML="";t.tBodies[0].innerHTML="";
+    if(fastBtn.classList.contains("active")){
+        let m=calcOne("肉",meatSpeed.value,meatDouble.checked);
+        let w=calcOne("木",woodSpeed.value,woodDouble.checked);
+        let c=calcOne("煤",coalSpeed.value,coalDouble.checked);
+        let i=calcOne("铁",ironSpeed.value,ironDouble.checked);
+        t.tHead.innerHTML=`<tr><th>等级</th><th>总量</th><th>肉耗时</th><th>木耗时</th><th>煤耗时</th><th>铁耗时</th><th>肉开始</th><th>木开始</th><th>煤开始</th><th>铁开始</th></tr>`;
+        let htm="";for(let x=0;x<8;x++){
+            htm+=`<tr><td>${x+1}</td><td>${(1200000*(x+1)).toLocaleString()}</td><td>${m?m[x].time:"-"}</td><td>${w?w[x].time:"-"}</td><td>${c?c[x].time:"-"}</td><td>${i?i[x].time:"-"}</td><td>${m?m[x].start:"-"}</td><td>${w?w[x].start:"-"}</td><td>${c?c[x].start:"-"}</td><td>${i?i[x].start:"-"}</td></tr>`;
+        }
+        t.tBodies[0].innerHTML=htm;
+    }else{
+        let mat=document.querySelector('input[name="mat"]:checked').value;
+        let d=calcOne(mat,speed.value,doubleSpeed.checked);
+        if(!d){alert("请输入速度");return;}
+        t.tHead.innerHTML=`<tr><th>等级</th><th>总量</th><th>耗时</th><th>开始时间</th></tr>`;
+        let htm="";d.forEach(x=>{htm+=`<tr><td>${x.lv}</td><td>${x.total.toLocaleString()}</td><td>${x.time}</td><td>${x.start}</td></tr>`;});
+        t.tBodies[0].innerHTML=htm;
+    }
+}
+</script>
+</body>
+</html>
