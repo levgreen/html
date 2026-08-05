@@ -261,7 +261,7 @@
         
         <!-- 全局加成设置 -->
         <div class="global-bonus">
-            <h3>全局加成设置（黄色可编辑）</h3>
+        <h3>全局加成设置（黄色可编辑）</h3>
             <div class="bonus-row">
                 <div class="bonus-item">
                     <label style="width:70px; text-align:right;">孙策：</label>
@@ -271,7 +271,10 @@
                     <label style="width:70px; text-align:right;">烽火：</label>
                     <input type="number" id="bonus-fenghuo" class="cell-input" step="0.5">
                 </div>
-                <!-- 新增商车输入框 -->
+                <div class="bonus-item">
+                    <label style="width:70px; text-align:right;">招募：</label>
+                    <input type="number" id="bonus-zhaomu" class="cell-input" step="0.5">
+                </div>
                 <div class="bonus-item">
                     <label style="width:70px; text-align:right;">商车：</label>
                     <input type="number" id="bonus-shangche" class="cell-input" step="0.5">
@@ -1292,8 +1295,8 @@
                 let def = "";
                 if(input.id === "bonus-sunce") def = "30";
                 if(input.id === "bonus-fenghuo") def = "64";
-                if(input.id === "bonus-shangche") def = "58"; // 新增商车默认值
                 if(input.id === "bonus-zhaomu") def = "52";
+                if(input.id === "bonus-shangche") def = "58";
                 if(input.id === "bonus-jiasu") def = "55";
                 if(input.id === "bonus-lianbing") def = "52";
                 if(input.id === "bonus-feiyuanbao") def = "27.5";
