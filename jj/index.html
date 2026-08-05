@@ -108,11 +108,13 @@
             width: 100%;
             border-collapse: collapse;
             font-size: 14px;
+            min-width: 750px;
         }
         th, td {
-            padding: 10px 12px;
+            padding: 10px 6px !important;
             text-align: center;
             border: 1px solid #e0e0e0;
+            min-width: 68px;
         }
         th {
             background: #f0f4f8;
@@ -124,17 +126,19 @@
             padding-left: 15px;
             background: #fafafa;
             font-weight: 500;
+            min-width: 120px;
         }
         /* 可输入单元格 */
         input.cell-input {
             width: 100%;
-            padding: 6px 8px;
+            padding: 7px 2px !important;
             border: 1px solid #e0c060;
             border-radius: 3px;
             text-align: center;
             background: #fff9c4;
-            font-size: 14px;
+            font-size: 14px !important;
             font-family: inherit;
+            min-width: 55px;
         }
         input.cell-input:focus {
             outline: none;
@@ -148,7 +152,6 @@
             font-family: "Consolas", monospace;
             min-width: 95px;
             word-break: break-all;
-            padding: 10px 6px !important;
         }
         td.initial-cell {
             background: #f0f0f0;
@@ -188,30 +191,67 @@
             color: #999;
             margin-top: 4px;
         }
-        /* 响应式 */
+        /* 配置面板 */
+        .config-panel {
+            margin: 15px 20px;
+            padding: 12px;
+            background: #fffef0;
+            border-radius: 6px;
+            border: 1px solid #ffdd99;
+        }
+        .config-panel h3 {
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        .config-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 8px;
+        }
+        .config-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .config-item input[name=cfgName] {
+            width: 100px;
+            padding: 4px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+        .config-btn {
+            padding: 4px 10px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+        .btn-save { background: #42b983; color: #fff; }
+        .btn-load { background: #4a90d9; color: #fff; }
+        .btn-export { background: #ff9800; color: #fff; }
+        .btn-import { background: #9c27b0; color: #fff; }
+        .config-file-input {
+            display: none;
+        }
+        /* 响应式手机适配 */
         @media (max-width: 768px) {
             body { padding: 10px; }
             h1 { font-size: 20px; padding: 15px; }
             .tabs { flex-wrap: wrap; }
             .tab { flex: none; width: 33.33%; font-size: 13px; padding: 10px 5px; }
             th, td { padding: 8px 4px; font-size: 12px; min-width: 68px; }
-            input.cell-input {
-                padding: 7px 2px !important;
-                font-size: 14px !important;
-                min-width: 55px;
-            }
-            /* 手机端倍率单元格最小宽度 */
+            .bonus-row { gap: 10px; }
+            .bonus-item input { width: 75px !important; }
             td.calc-cell {
                 min-width: 80px !important;
                 font-size: 11px;
             }
-            /* 手机端总积分加宽 */
             .total-score {
                 min-width: 105px !important;
                 font-size: 14px !important;
             }
-            .bonus-row { gap: 10px; }
-            .bonus-item input { width: 75px !important; }
         }
     </style>
 </head>
@@ -220,39 +260,71 @@
         <h1>积分计算器</h1>
         
         <!-- 全局加成设置 -->
-<div class="global-bonus">
-    <h3>全局加成设置（黄色可编辑）</h3>
-    <div class="bonus-row">
-        <div class="bonus-item">
-            <label style="width:70px; text-align:right;">孙策：</label>
-            <input type="number" id="bonus-sunce" class="cell-input" step="0.5">
+        <div class="global-bonus">
+            <h3>全局加成设置（黄色可编辑）</h3>
+            <div class="bonus-row">
+                <div class="bonus-item">
+                    <label style="width:70px; text-align:right;">孙策：</label>
+                    <input type="number" id="bonus-sunce" class="cell-input" step="0.5">
+                </div>
+                <div class="bonus-item">
+                    <label style="width:70px; text-align:right;">通用加速：</label>
+                    <input type="number" id="bonus-jiasu" class="cell-input" step="0.5">
+                </div>
+                <div class="bonus-item">
+                    <label style="width:70px; text-align:right;">通用非元宝：</label>
+                    <input type="number" id="bonus-feiyuanbao" class="cell-input" step="0.5">
+                </div>
+                <div class="bonus-item">
+                    <label style="width:70px; text-align:right;">商车：</label>
+                    <input type="number" id="bonus-shangche" class="cell-input" step="0.5">
+                </div>
+                <div class="bonus-item">
+                    <label style="width:70px; text-align:right;">烽火：</label>
+                    <input type="number" id="bonus-fenghuo" class="cell-input" step="0.5">
+                </div>
+                <div class="bonus-item">
+                    <label style="width:70px; text-align:right;">招募：</label>
+                    <input type="number" id="bonus-zhaomu" class="cell-input" step="0.5">
+                </div>
+                <div class="bonus-item">
+                    <label style="width:70px; text-align:right;">练兵：</label>
+                    <input type="number" id="bonus-lianbing" class="cell-input" step="0.5">
+                </div>
+            </div>
         </div>
-        <div class="bonus-item">
-            <label style="width:70px; text-align:right;">通用加速：</label>
-            <input type="number" id="bonus-jiasu" class="cell-input" step="0.5">
+
+        <!-- 配置预设面板 -->
+        <div class="config-panel">
+            <h3>配置预设（4组）</h3>
+            <div class="config-row">
+                <div class="config-item">
+                    <input type="text" name="cfgName" data-cfg="1" placeholder="配置1名称">
+                    <button class="config-btn btn-save" data-save="1">保持当前</button>
+                    <button class="config-btn btn-load" data-load="1">载入</button>
+                </div>
+                <div class="config-item">
+                    <input type="text" name="cfgName" data-cfg="2" placeholder="配置2名称">
+                    <button class="config-btn btn-save" data-save="2">保持当前</button>
+                    <button class="config-btn btn-load" data-load="2">载入</button>
+                </div>
+                <div class="config-item">
+                    <input type="text" name="cfgName" data-cfg="3" placeholder="配置3名称">
+                    <button class="config-btn btn-save" data-save="3">保持当前</button>
+                    <button class="config-btn btn-load" data-load="3">载入</button>
+                </div>
+                <div class="config-item">
+                    <input type="text" name="cfgName" data-cfg="4" placeholder="配置4名称">
+                    <button class="config-btn btn-save" data-save="4">保持当前</button>
+                    <button class="config-btn btn-load" data-load="4">载入</button>
+                </div>
+            </div>
+            <div class="config-row">
+                <button class="config-btn btn-export" id="exportCfg">导出全部配置</button>
+                <button class="config-btn btn-import" id="importCfgBtn">载入配置文件</button>
+                <input type="file" class="config-file-input" id="importFile" accept=".json">
+            </div>
         </div>
-        <div class="bonus-item">
-            <label style="width:70px; text-align:right;">通用非元宝：</label>
-            <input type="number" id="bonus-feiyuanbao" class="cell-input" step="0.5">
-        </div>
-        <div class="bonus-item">
-            <label style="width:70px; text-align:right;">商车：</label>
-            <input type="number" id="bonus-shangche" class="cell-input" step="0.5">
-        </div>
-        <div class="bonus-item">
-            <label style="width:70px; text-align:right;">烽火：</label>
-            <input type="number" id="bonus-fenghuo" class="cell-input" step="0.5">
-        </div>
-        <div class="bonus-item">
-            <label style="width:70px; text-align:right;">招募：</label>
-            <input type="number" id="bonus-zhaomu" class="cell-input" step="0.5">
-        </div>
-        <div class="bonus-item">
-            <label style="width:70px; text-align:right;">练兵：</label>
-            <input type="number" id="bonus-lianbing" class="cell-input" step="0.5">
-        </div>
-    </div>
-</div>
 
         <!-- Tab 标签 -->
         <div class="tabs">
@@ -904,13 +976,16 @@
             3. 现积分值 = 初始值 × (1 + 倍数%)<br>
             4. 获取积分 = 现积分值 × 数量 × 额外乘数（采集食物木材×10、煤×20、铁×40、练兵等级×单次练兵轮数）<br>
             5. 总积分 = 已有积分 + 可获取积分<br>
-            6. 所有输入数据自动本地保存，关闭/刷新页面下次打开自动恢复上次填写内容
+            6. 所有输入数据自动本地保存，关闭/刷新页面下次打开自动恢复<br>
+            7. 配置功能：4组预设，自定义名称、保存当前数值、载入、导出/导入json备份
         </div>
     </div>
 
     <script>
-        // 本地存储前缀，防止和其他页面冲突
+        // 本地存储前缀
         const STORAGE_KEY_PREFIX = "scoreCalc_";
+        // 配置存储KEY
+        const CFG_STORE_KEY = "scoreCalc_configs";
 
         // 加成类型
         const BONUS = {
@@ -985,16 +1060,14 @@
             ]
         };
 
-        // 获取存储key
+        // 本地存储工具
         function getStoreKey(id) {
             return STORAGE_KEY_PREFIX + id;
         }
-        // 保存输入值到本地存储
         function saveInput(el) {
             const key = getStoreKey(el.id || el.dataset.qty);
             localStorage.setItem(key, el.value);
         }
-        // 读取本地存储回填输入框
         function loadInput(el, defaultVal = "") {
             const key = getStoreKey(el.id || el.dataset.qty);
             const val = localStorage.getItem(key);
@@ -1005,12 +1078,11 @@
             }
         }
 
-        // 获取当前加成值
+        // 获取加成总和
         function getBonus(type) {
             const sunce = parseFloat(document.getElementById('bonus-sunce').value) || 0;
             const feiyuanbao = parseFloat(document.getElementById('bonus-feiyuanbao').value) || 0;
             let base = sunce + feiyuanbao;
-            
             switch(type) {
                 case BONUS.BASE: return base;
                 case BONUS.SPEED: return base + (parseFloat(document.getElementById('bonus-jiasu').value) || 0);
@@ -1022,48 +1094,43 @@
             }
         }
 
-        // 获取练兵轮数
+        // 练兵轮数
         function getTrainCount() {
             return parseFloat(document.getElementById('train-count').value) || 0;
         }
 
-        // 格式化数字
+        // 数字格式化
         function formatNum(num) {
             if (num === 0) return '0';
             if (Number.isInteger(num)) return num.toLocaleString();
             return num.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
         }
 
-        // 重新计算所有
+        // 全局重计算
         function recalcAll() {
             for (let day = 1; day <= 6; day++) {
                 const items = dayConfig[day];
                 let sum = 0;
-                
                 items.forEach((item, idx) => {
                     const i = idx + 1;
                     const bonus = getBonus(item.bonus);
                     const currentScore = item.init * (1 + bonus / 100);
                     const qty = parseFloat(document.querySelector(`[data-qty="d${day}-${i}"]`).value) || 0;
-                    
                     let mult = item.mult;
                     if (mult === 'train') mult = getTrainCount();
-                    
                     const earned = currentScore * qty * mult;
                     sum += earned;
-                    
                     document.querySelector(`[data-calc="c${day}-${i}"]`).textContent = formatNum(currentScore);
                     document.querySelector(`[data-calc="e${day}-${i}"]`).textContent = formatNum(earned);
                     document.querySelector(`[data-calc="g${day}-${i}"]`).textContent = bonus.toFixed(1);
                 });
-                
                 const existing = parseFloat(document.querySelector(`[data-qty="f${day}"]`).value) || 0;
                 document.querySelector(`[data-calc="sum${day}"]`).textContent = formatNum(sum);
                 document.querySelector(`[data-calc="total${day}"]`).textContent = formatNum(sum + existing);
             }
         }
 
-        // Tab 切换
+        // Tab切换
         document.querySelectorAll('.tab').forEach(tab => {
             tab.addEventListener('click', function() {
                 const day = this.dataset.day;
@@ -1074,13 +1141,117 @@
             });
         });
 
-        // 初始化：加载本地存储 + 绑定事件
+        // ====================== 配置预设相关 ======================
+        let configList = JSON.parse(localStorage.getItem(CFG_STORE_KEY)) || [
+            {name:"配置1",data:{}},
+            {name:"配置2",data:{}},
+            {name:"配置3",data:{}},
+            {name:"配置4",data:{}}
+        ];
+        function saveConfigToLocal(){
+            localStorage.setItem(CFG_STORE_KEY, JSON.stringify(configList));
+        }
+        function getAllInputData(){
+            const data = {};
+            document.querySelectorAll('input[type="number"].cell-input').forEach(inp=>{
+                const key = getStoreKey(inp.id || inp.dataset.qty);
+                data[key] = inp.value;
+            });
+            return data;
+        }
+        function fillAllInput(data){
+            document.querySelectorAll('input[type="number"].cell-input').forEach(inp=>{
+                const key = getStoreKey(inp.id || inp.dataset.qty);
+                if(data[key] !== undefined){
+                    inp.value = data[key];
+                }
+            });
+            recalcAll();
+        }
+        function renderConfigNames(){
+            for(let i=0;i<4;i++){
+                const cfg = configList[i];
+                const nameInput = document.querySelector(`input[name="cfgName"][data-cfg="${i+1}"]`);
+                nameInput.value = cfg.name;
+            }
+        }
+        function bindConfigEvent(){
+            // 重命名
+            document.querySelectorAll('input[name="cfgName"]').forEach(input=>{
+                input.addEventListener('input',()=>{
+                    const idx = Number(input.dataset.cfg) - 1;
+                    configList[idx].name = input.value;
+                    saveConfigToLocal();
+                });
+            });
+            // 保存当前配置
+            document.querySelectorAll('.btn-save').forEach(btn=>{
+                btn.addEventListener('click',()=>{
+                    const idx = Number(btn.dataset.save) - 1;
+                    configList[idx].data = getAllInputData();
+                    saveConfigToLocal();
+                    alert(`已保存至【${configList[idx].name}】`);
+                });
+            });
+            // 载入配置
+            document.querySelectorAll('.btn-load').forEach(btn=>{
+                btn.addEventListener('click',()=>{
+                    const idx = Number(btn.dataset.load) - 1;
+                    const cfg = configList[idx];
+                    if(Object.keys(cfg.data).length === 0){
+                        alert("该配置暂无保存数据");
+                        return;
+                    }
+                    fillAllInput(cfg.data);
+                    alert(`已载入【${cfg.name}】`);
+                });
+            });
+            // 导出json
+            document.getElementById('exportCfg').addEventListener('click',()=>{
+                const blob = new Blob([JSON.stringify(configList,null,2)],{type:"application/json"});
+                const a = document.createElement("a");
+                a.href = URL.createObjectURL(blob);
+                a.download = "积分计算器配置.json";
+                a.click();
+                URL.revokeObjectURL(a.href);
+            });
+            // 导入文件触发
+            document.getElementById('importCfgBtn').addEventListener('click',()=>{
+                document.getElementById('importFile').click();
+            });
+            // 读取导入文件
+            document.getElementById('importFile').addEventListener('change',(e)=>{
+                const file = e.target.files[0];
+                if(!file) return;
+                const reader = new FileReader();
+                reader.onload = ev=>{
+                    try{
+                        const json = JSON.parse(ev.target.result);
+                        if(!Array.isArray(json) || json.length !==4){
+                            alert("配置文件错误，必须包含4组预设");
+                            return;
+                        }
+                        configList = json;
+                        saveConfigToLocal();
+                        renderConfigNames();
+                        alert("配置导入成功");
+                    }catch(err){
+                        alert("文件解析失败，非有效配置文件");
+                    }
+                };
+                reader.readAsText(file);
+                e.target.value = "";
+            });
+        }
+        function initConfig(){
+            renderConfigNames();
+            bindConfigEvent();
+        }
+        // ====================== 初始化入口 ======================
         function init() {
             const allInputs = document.querySelectorAll('input[type="number"].cell-input');
-            // 回填本地存储数据
             allInputs.forEach(input => {
                 let def = "";
-                // 全局加成默认值
                 if(input.id === "bonus-sunce") def = "30";
                 if(input.id === "bonus-jiasu") def = "55";
                 if(input.id === "bonus-feiyuanbao") def = "27.5";
@@ -1091,14 +1262,13 @@
                 if(input.id === "train-count") def = "801";
                 if(input.dataset.qty === "f1") def = "13808336";
                 loadInput(input, def);
-
-                // 输入时自动保存并重算
                 input.addEventListener('input', function(){
                     saveInput(this);
                     recalcAll();
                 });
             });
             recalcAll();
+            initConfig();
         }
         init();
     </script>
