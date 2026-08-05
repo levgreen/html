@@ -45,23 +45,25 @@
         .bonus-row {
             display: flex;
             flex-wrap: wrap;
-            gap: 15px 30px;
+            gap: 12px 16px;
             align-items: center;
         }
         .bonus-item {
             display: flex;
             align-items: center;
-            gap: 8px;
-            min-width: 130px;
+            gap: 6px;
+            min-width: 145px;
         }
         .bonus-item label {
-            font-size: 14px;
+            width: 72px;
+            text-align: right;
+            font-size: 13px;
             color: #666;
             white-space: nowrap;
         }
         .bonus-item input {
-            width: 70px;
-            padding: 5px 8px;
+            width: 85px !important;
+            padding: 6px 4px;
             border: 1px solid #e0c060;
             border-radius: 4px;
             text-align: center;
@@ -185,11 +187,20 @@
             h1 { font-size: 20px; padding: 15px; }
             .tabs { flex-wrap: wrap; }
             .tab { flex: none; width: 33.33%; font-size: 13px; padding: 10px 5px; }
-            th, td { padding: 8px 6px; font-size: 12px; }
-            input.cell-input { padding: 4px; font-size: 12px; }
+            th, td { padding: 8px 4px; font-size: 12px; }
+            input.cell {
+                padding: 6px 2px !important;
+                font-size: 14px !important;
+                min-width: 60px;
+            }
             .bonus-row { gap: 10px; }
-            .bonus-item input { width: 60px; }
-        }
+            .bonus-item input { width: 75px !important; }
+            input.cell-input {
+                padding: 7px 2px !important;
+                font-size: 14px !important;
+                min-width: 55px;
+    }
+}
     </style>
 </head>
 <body>
