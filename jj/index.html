@@ -271,9 +271,10 @@
                     <label style="width:70px; text-align:right;">烽火：</label>
                     <input type="number" id="bonus-fenghuo" class="cell-input" step="0.5">
                 </div>
+                <!-- 新增商车输入框 -->
                 <div class="bonus-item">
-                    <label style="width:70px; text-align:right;">招募：</label>
-                    <input type="number" id="bonus-zhaomu" class="cell-input" step="0.5">
+                    <label style="width:70px; text-align:right;">商车：</label>
+                    <input type="number" id="bonus-shangche" class="cell-input" step="0.5">
                 </div>
                 <div class="bonus-item">
                     <label style="width:70px; text-align:right;">使用加速：</label>
@@ -289,7 +290,6 @@
                 </div>
             </div>
         </div>
-
         <!-- 配置预设面板（已添加重置按钮） -->
         <div class="config-panel">
             <h3>配置预设（4组）</h3>
@@ -1292,12 +1292,13 @@
                 let def = "";
                 if(input.id === "bonus-sunce") def = "30";
                 if(input.id === "bonus-fenghuo") def = "64";
+                if(input.id === "bonus-shangche") def = "58"; // 新增商车默认值
                 if(input.id === "bonus-zhaomu") def = "52";
                 if(input.id === "bonus-jiasu") def = "55";
                 if(input.id === "bonus-lianbing") def = "52";
                 if(input.id === "bonus-feiyuanbao") def = "27.5";
                 if(input.id === "train-count") def = "801";
-                if(input.dataset.qty === "f1") def = "13808336";
+                //if(input.dataset.qty === "f1") def = "13808336";
                 loadInput(input, def);
                 input.addEventListener('input', function(){
                     saveInput(this);
