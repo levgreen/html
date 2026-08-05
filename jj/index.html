@@ -99,6 +99,7 @@
         .tab-content {
             display: none;
             padding: 20px;
+            overflow-x: auto;
         }
         .tab-content.active {
             display: block;
@@ -145,11 +146,15 @@
             background: #f5f5f5;
             color: #333;
             font-family: "Consolas", monospace;
+            min-width: 95px;
+            word-break: break-all;
+            padding: 10px 6px !important;
         }
         td.initial-cell {
             background: #f0f0f0;
             color: #666;
             font-family: "Consolas", monospace;
+            min-width: 75px;
         }
         /* 汇总行 */
         tr.summary-row td {
@@ -165,6 +170,8 @@
             font-size: 18px !important;
             color: #d32f2f !important;
             font-weight: 700 !important;
+            min-width: 130px;
+            word-break: break-all;
         }
         /* 说明文字 */
         .note {
@@ -187,20 +194,25 @@
             h1 { font-size: 20px; padding: 15px; }
             .tabs { flex-wrap: wrap; }
             .tab { flex: none; width: 33.33%; font-size: 13px; padding: 10px 5px; }
-            th, td { padding: 8px 4px; font-size: 12px; }
-            input.cell {
-                padding: 6px 2px !important;
-                font-size: 14px !important;
-                min-width: 60px;
-            }
-            .bonus-row { gap: 10px; }
-            .bonus-item input { width: 75px !important; }
+            th, td { padding: 8px 4px; font-size: 12px; min-width: 68px; }
             input.cell-input {
                 padding: 7px 2px !important;
                 font-size: 14px !important;
                 min-width: 55px;
-    }
-}
+            }
+            /* 手机端倍率单元格最小宽度 */
+            td.calc-cell {
+                min-width: 80px !important;
+                font-size: 11px;
+            }
+            /* 手机端总积分加宽 */
+            .total-score {
+                min-width: 105px !important;
+                font-size: 14px !important;
+            }
+            .bonus-row { gap: 10px; }
+            .bonus-item input { width: 75px !important; }
+        }
     </style>
 </head>
 <body>
