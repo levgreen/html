@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>积分计算器</title>
+    <title>角逐积分计算器</title>
     <style>
         * {
             margin: 0;
@@ -31,7 +31,6 @@
             color: #fff;
             font-size: 24px;
         }
-        /* 全局加成区 */
         .global-bonus {
             padding: 15px 20px;
             background: #f9f9f9;
@@ -70,7 +69,6 @@
             background: #fff9c4;
             font-size: 14px;
         }
-        /* Tab 标签 */
         .tabs {
             display: flex;
             background: #e8e8e8;
@@ -87,28 +85,23 @@
             transition: all 0.2s;
             border-bottom: 3px solid transparent;
         }
-        .tab:hover {
-            background: #ddd;
-        }
+        .tab:hover { background: #ddd; }
         .tab.active {
             background: #fff;
             color: #4a90d9;
             border-bottom-color: #4a90d9;
         }
-        /* 表格区 */
         .tab-content {
             display: none;
             padding: 20px;
             overflow-x: auto;
         }
-        .tab-content.active {
-            display: block;
-        }
+        .tab-content.active { display: block; }
         table {
             width: 100%;
             border-collapse: collapse;
             font-size: 14px;
-            min-width: 750px;
+            min-width: 750;
         }
         th, td {
             padding: 10px 6px !important;
@@ -119,7 +112,6 @@
         th {
             background: #f0f4f8;
             font-weight: 600;
-            color: #555;
         }
         td.item-name {
             text-align: left;
@@ -128,7 +120,6 @@
             font-weight: 500;
             min-width: 120px;
         }
-        /* 可输入单元格 */
         input.cell-input {
             width: 100%;
             padding: 7px 2px !important;
@@ -143,9 +134,8 @@
         input.cell-input:focus {
             outline: none;
             border-color: #f5a623;
-            box-shadow: 0 0 3px rgba(245,166,35,0.3);
+            box-shadow: 0 0 3px rgba(245,166,0.3);
         }
-        /* 计算结果单元格 */
         td.calc-cell {
             background: #f5f5f5;
             color: #333;
@@ -159,7 +149,6 @@
             font-family: "Consolas", monospace;
             min-width: 75px;
         }
-        /* 汇总行 */
         tr.summary-row td {
             background: #e8f4fd !important;
             font-weight: 600;
@@ -168,7 +157,6 @@
         tr.summary-row td.item-name {
             background: #d6eaf8 !important;
         }
-        /* 总积分高亮 */
         .total-score {
             font-size: 18px !important;
             color: #d32f2f !important;
@@ -176,7 +164,6 @@
             min-width: 130px;
             word-break: break-all;
         }
-        /* 说明文字 */
         .note {
             margin-top: 15px;
             padding: 10px 15px;
@@ -191,7 +178,6 @@
             color: #999;
             margin-top: 4px;
         }
-        /* 配置面板 */
         .config-panel {
             margin: 15px 20px;
             padding: 12px;
@@ -219,7 +205,7 @@
             width: 100px;
             padding: 4px;
             border: 1px solid #ccc;
-            border-radius: 3;
+            border-radius: 3px;
         }
         .config-btn {
             padding: 4px 10px;
@@ -232,68 +218,58 @@
         .btn-load { background: #4a90d9; color: #fff; }
         .btn-export { background: #ff9800; color: #fff; }
         .btn-import { background: #9c27b0; color: #fff; }
-        .config-file-input {
-            display: none;
+        #resetQtyBtn { background: #f44336; color: #fff; }
+        .config-file-input { display: none; }
+        .iframe-wrap {
+            margin: 15px 20px;
+            padding: 16px;
+            background: #fffef0;
+            border-radius: 6px;
+            border: 1px solid #ffdd99;
         }
-        /* 响应式手机适配 */
+        .iframe-wrap h3 {
+            font-size: 16px;
+            margin-bottom: 12px;
+        }
+        .iframe-wrap {
+            margin: 15px 20px;
+            padding: 16px;
+            background: #fffef0;
+            border-radius: 6px;
+            border: 1px solid #ffdd99;
+        }
+        .iframe-wrap h3 {
+            font-size: 16px;
+            margin-bottom: 12px;
+        }
+        .iframe-wrap iframe {
+            width: 100%;
+            border: none;
+            min-height: 320px;
+            height: auto;
+        }
         @media (max-width: 768px) {
-            body { padding: 10px; }
-            h1 { font-size: 20px; padding: 15px; }
-            .tabs { flex-wrap: wrap; }
-            .tab { flex: none; width: 33.33%; font-size: 13px; padding: 10px 5px; }
-            th, td { padding: 8px 4px; font-size: 12px; min-width: 68px; }
-            .bonus-row { gap: 10px; }
-            .bonus-item input { width: 75px !important; }
-            td.calc-cell {
-                min-width: 80px !important;
-                font-size: 11px;
-            }
-            .total-score {
-                min-width: 105px !important;
-                font-size: 14px !important;
+            .iframe-wrap iframe {
+                min-height: 360px;
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>积分计算器</h1>
-        
-        <!-- 全局加成设置 -->
+        <h1>角逐积分计算器</h1>
         <div class="global-bonus">
-        <h3>全局加成设置（黄色可编辑）</h3>
+            <h3>全局加成设置（黄色可编辑）</h3>
             <div class="bonus-row">
-                <div class="bonus-item">
-                    <label style="width:70px; text-align:right;">孙策：</label>
-                    <input type="number" id="bonus-sunce" class="cell-input" step="0.5">
-                </div>
-                <div class="bonus-item">
-                    <label style="width:70px; text-align:right;">烽火：</label>
-                    <input type="number" id="bonus-fenghuo" class="cell-input" step="0.5">
-                </div>
-                <div class="bonus-item">
-                    <label style="width:70px; text-align:right;">商车：</label>
-                    <input type="number" id="bonus-shangche" class="cell-input" step="0.5">
-                </div>
-                <div class="bonus-item">
-                    <label style="width:70px; text-align:right;">招募：</label>
-                    <input type="number" id="bonus-zhaomu" class="cell-input" step="0.5">
-                </div> 
-                <div class="bonus-item">
-                    <label style="width:70px; text-align:right;">使用加速：</label>
-                    <input type="number" id="bonus-jiasu" class="cell-input" step="0.5">
-                </div>
-                <div class="bonus-item">
-                    <label style="width:70px; text-align:right;">训练士兵：</label>
-                    <input type="number" id="bonus-lianbing" class="cell-input" step="0.5">
-                </div>
-                <div class="bonus-item">
-                    <label style="width:70px; text-align:right;">通用非元宝：</label>
-                    <input type="number" id="bonus-feiyuanbao" class="cell-input" step="0.5">
-                </div>
+                <div class="bonus-item"><label>孙策：</label><input type="number" id="bonus-sunce" class="cell-input" step="0.5"></div>
+                <div class="bonus-item"><label>烽火：</label><input type="number" id="bonus-fenghuo" class="cell-input" step="0.5"></div>
+                <div class="bonus-item"><label>商车：</label><input type="number" id="bonus-shangche" class="cell-input" step="0.5"></div>
+                <div class="bonus-item"><label>招募：</label><input type="number" id="bonus-zhaomu" class="cell-input" step="0.5"></div>
+                <div class="bonus-item"><label>使用加速：</label><input type="number" id="bonus-jiasu" class="cell-input" step="0.5"></div>
+                <div class="bonus-item"><label>训练士兵：</label><input type="number" id="bonus-lianbing" class="cell-input" step="0.5"></div>
+                <div class="bonus-item"><label>通用非元宝：</label><input type="number" id="bonus-feiyuanbao" class="cell-input" step="0.5"></div>
             </div>
         </div>
-        <!-- 配置预设面板（已添加重置按钮） -->
         <div class="config-panel">
             <h3>配置预设（4组）</h3>
             <div class="config-row">
@@ -322,11 +298,13 @@
                 <button class="config-btn btn-export" id="exportCfg">导出全部配置</button>
                 <button class="config-btn btn-import" id="importCfgBtn">载入配置文件</button>
                 <input type="file" class="config-file-input" id="importFile" accept=".json">
-                <button class="config-btn" style="background:#f44336;color:#fff" id="resetQtyBtn">重置所有数量</button>
+                <button class="config-btn" id="resetQtyBtn">重置所有数量</button>
             </div>
         </div>
-
-        <!-- Tab 标签 -->
+        <div class="iframe-wrap">
+            <h3>神兵/玉石/数值倍数换算工具</h3>
+            <iframe src="jade-calc.html"></iframe>
+        </div>
         <div class="tabs">
             <div class="tab active" data-day="1">第一天</div>
             <div class="tab" data-day="2">第二天</div>
@@ -335,19 +313,10 @@
             <div class="tab" data-day="5">第五天</div>
             <div class="tab" data-day="6">第六天</div>
         </div>
-
-        <!-- 第一天 -->
         <div class="tab-content active" id="day1">
             <table>
                 <thead>
-                    <tr>
-                        <th style="width:22%">项目</th>
-                        <th>现积分值</th>
-                        <th>数量</th>
-                        <th>获取积分</th>
-                        <th>初始值</th>
-                        <th>倍数(%)</th>
-                    </tr>
+                    <tr><th style="width:22%">项目</th><th>现积分值</th><th>数量</th><th>获取积分</th><th>初始值</th><th>倍数(%)</th></tr>
                 </thead>
                 <tbody>
                     <tr>
@@ -408,44 +377,26 @@
                     </tr>
                     <tr class="summary-row">
                         <td class="item-name">可获取积分</td>
-                        <td></td>
-                        <td></td>
-                        <td class="calc-cell" data-calc="sum1"></td>
-                        <td></td>
-                        <td></td>
+                        <td></td><td></td>
+                        <td class="calc-cell" data-calc="sum1"></td><td></td><td></td>
                     </tr>
                     <tr class="summary-row">
                         <td class="item-name">已有积分</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td><input type="number" class="cell-input" data-qty="f1"></td>
-                        <td></td>
+                        <td></td><td></td><td></td>
+                        <td><input type="number" class="cell-input" data-qty="f1"></td><td></td>
                     </tr>
                     <tr class="summary-row">
                         <td class="item-name">总积分</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
+                        <td></td><td></td><td></td><td></td>
                         <td class="calc-cell total-score" data-calc="total1"></td>
                     </tr>
                 </tbody>
             </table>
         </div>
-
-        <!-- 第二天 -->
         <div class="tab-content" id="day2">
             <table>
                 <thead>
-                    <tr>
-                        <th style="width:22%">项目</th>
-                        <th>现积分值</th>
-                        <th>数量</th>
-                        <th>获取积分</th>
-                        <th>初始值</th>
-                        <th>倍数(%)</th>
-                    </tr>
+                    <tr><th style="width:22%">项目</th><th>现积分值</th><th>数量</th><th>获取积分</th><th>初始值</th><th>倍数(%)</th></tr>
                 </thead>
                 <tbody>
                     <tr>
@@ -498,44 +449,26 @@
                     </tr>
                     <tr class="summary-row">
                         <td class="item-name">可获取积分</td>
-                        <td></td>
-                        <td></td>
-                        <td class="calc-cell" data-calc="sum2"></td>
-                        <td></td>
-                        <td></td>
+                        <td></td><td></td>
+                        <td class="calc-cell" data-calc="sum2"></td><td></td><td></td>
                     </tr>
                     <tr class="summary-row">
                         <td class="item-name">已有积分</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td><input type="number" class="cell-input" data-qty="f2"></td>
-                        <td></td>
+                        <td></td><td></td><td></td>
+                        <td><input type="number" class="cell-input" data-qty="f2"></td><td></td>
                     </tr>
                     <tr class="summary-row">
                         <td class="item-name">总积分</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
+                        <td></td><td></td><td></td><td></td>
                         <td class="calc-cell total-score" data-calc="total2"></td>
                     </tr>
                 </tbody>
             </table>
         </div>
-
-        <!-- 第三天 -->
         <div class="tab-content" id="day3">
             <table>
                 <thead>
-                    <tr>
-                        <th style="width:22%">项目</th>
-                        <th>现积分值</th>
-                        <th>数量</th>
-                        <th>获取积分</th>
-                        <th>初始值</th>
-                        <th>倍数(%)</th>
-                    </tr>
+                    <tr><th style="width:22%">项目</th><th>现积分值</th><th>数量</th><th>获取积分</th><th>初始值</th><th>倍数(%)</th></tr>
                 </thead>
                 <tbody>
                     <tr>
@@ -628,44 +561,26 @@
                     </tr>
                     <tr class="summary-row">
                         <td class="item-name">可获取积分</td>
-                        <td></td>
-                        <td></td>
-                        <td class="calc-cell" data-calc="sum3"></td>
-                        <td></td>
-                        <td></td>
+                        <td></td><td></td>
+                        <td class="calc-cell" data-calc="sum3"></td><td></td><td></td>
                     </tr>
                     <tr class="summary-row">
                         <td class="item-name">已有积分</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td><input type="number" class="cell-input" data-qty="f3"></td>
-                        <td></td>
+                        <td></td><td></td><td></td>
+                        <td><input type="number" class="cell-input" data-qty="f3"></td><td></td>
                     </tr>
                     <tr class="summary-row">
                         <td class="item-name">总积分</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
+                        <td></td><td></td><td></td><td></td>
                         <td class="calc-cell total-score" data-calc="total3"></td>
                     </tr>
                 </tbody>
             </table>
         </div>
-
-        <!-- 第四天 -->
         <div class="tab-content" id="day4">
             <table>
                 <thead>
-                    <tr>
-                        <th style="width:22%">项目</th>
-                        <th>现积分值</th>
-                        <th>数量</th>
-                        <th>获取积分</th>
-                        <th>初始值</th>
-                        <th>倍数(%)</th>
-                    </tr>
+                    <tr><th style="width:22%">项目</th><th>现积分值</th><th>数量</th><th>获取积分</th><th>初始值</th><th>倍数(%)</th></tr>
                 </thead>
                 <tbody>
                     <tr>
@@ -702,49 +617,31 @@
                     </tr>
                     <tr class="summary-row">
                         <td class="item-name">可获取积分</td>
-                        <td></td>
-                        <td></td>
-                        <td class="calc-cell" data-calc="sum4"></td>
-                        <td></td>
-                        <td></td>
+                        <td></td><td></td>
+                        <td class="calc-cell" data-calc="sum4"></td><td></td><td></td>
                     </tr>
                     <tr class="summary-row">
                         <td class="item-name">已有积分</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td><input type="number" class="cell-input" data-qty="f4"></td>
-                        <td></td>
+                        <td></td><td></td><td></td>
+                        <td><input type="number" class="cell-input" data-qty="f4"></td><td></td>
                     </tr>
                     <tr class="summary-row">
                         <td class="item-name">总积分</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
+                        <td></td><td></td><td></td><td></td>
                         <td class="calc-cell total-score" data-calc="total4"></td>
                     </tr>
                 </tbody>
             </table>
         </div>
-
-        <!-- 第五天 -->
         <div class="tab-content" id="day5">
-            <div style="margin-bottom:12px; padding:8px 12px; background:#f0f7ff; border-radius:4px; font-size:13px; color:#4a6fa5;">
+            <div style="margin-bottom:12px; padding:8px 12px; background:#f0f7ff; border-radius:4px;">
                 <label style="font-weight:600;">单次练兵轮数：</label>
-                <input type="number" class="cell-input" id="train-count" style="width:100px; display:inline-block; margin-left:8px;">
+                <input type="number" class="cell-input" id="train-count" style="width:100px;display:inline-block;margin-left:8px;">
                 <div class="train-tip">备注：下方填写为加速多少轮，非多少个士兵</div>
             </div>
             <table>
                 <thead>
-                    <tr>
-                        <th style="width:22%">项目</th>
-                        <th>现积分值</th>
-                        <th>数量</th>
-                        <th>获取积分</th>
-                        <th>初始值</th>
-                        <th>倍数(%)</th>
-                    </tr>
+                    <tr><th style="width:22%">项目</th><th>现积分值</th><th>数量</th><th>获取积分</th><th>初始值</th><th>倍数(%)</th></tr>
                 </thead>
                 <tbody>
                     <tr>
@@ -853,44 +750,26 @@
                     </tr>
                     <tr class="summary-row">
                         <td class="item-name">可获取积分</td>
-                        <td></td>
-                        <td></td>
-                        <td class="calc-cell" data-calc="sum5"></td>
-                        <td></td>
-                        <td></td>
+                        <td></td><td></td>
+                        <td class="calc-cell" data-calc="sum5"></td><td></td><td></td>
                     </tr>
                     <tr class="summary-row">
                         <td class="item-name">已有积分</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td><input type="number" class="cell-input" data-qty="f5"></td>
-                        <td></td>
+                        <td></td><td></td><td></td>
+                        <td><input type="number" class="cell-input" data-qty="f5"></td><td></td>
                     </tr>
                     <tr class="summary-row">
                         <td class="item-name">总积分</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
+                        <td></td><td></td><td></td><td></td>
                         <td class="calc-cell total-score" data-calc="total5"></td>
                     </tr>
                 </tbody>
             </table>
         </div>
-
-        <!-- 第六天 -->
         <div class="tab-content" id="day6">
             <table>
                 <thead>
-                    <tr>
-                        <th style="width:22%">项目</th>
-                        <th>现积分值</th>
-                        <th>数量</th>
-                        <th>获取积分</th>
-                        <th>初始值</th>
-                        <th>倍数(%)</th>
-                    </tr>
+                    <tr><th style="width:22%">项目</th><th>现积分值</th><th>数量</th><th>获取积分</th><th>初始值</th><th>倍数(%)</th></tr>
                 </thead>
                 <tbody>
                     <tr>
@@ -951,32 +830,22 @@
                     </tr>
                     <tr class="summary-row">
                         <td class="item-name">可获取积分</td>
-                        <td></td>
-                        <td></td>
-                        <td class="calc-cell" data-calc="sum6"></td>
-                        <td></td>
-                        <td></td>
+                        <td></td><td></td>
+                        <td class="calc-cell" data-calc="sum6"></td><td></td><td></td>
                     </tr>
                     <tr class="summary-row">
                         <td class="item-name">已有积分</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td><input type="number" class="cell-input" data-qty="f6"></td>
-                        <td></td>
+                        <td></td><td></td><td></td>
+                        <td><input type="number" class="cell-input" data-qty="f6"></td><td></td>
                     </tr>
                     <tr class="summary-row">
                         <td class="item-name">总积分</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
+                        <td></td><td></td><td></td><td></td>
                         <td class="calc-cell total-score" data-calc="total6"></td>
                     </tr>
                 </tbody>
             </table>
         </div>
-
         <div class="note">
             <strong>说明：</strong><br>
             1. 黄色背景的单元格可以编辑，灰色单元格为自动计算结果<br>
@@ -985,16 +854,15 @@
             4. 获取积分 = 现积分值 × 数量 × 额外乘数（采集食物、木材、煤、铁填写采集数量(240即240W)、练兵等级×单次练兵轮数）<br>
             5. 总积分 = 已有积分 + 可获取积分<br>
             6. 所有输入数据自动本地保存，关闭/刷新页面下次打开自动恢复<br>
-            7. 配置功能：4组预设，自定义名称、保存当前数值、载入、导出/导入json备份
+            7. 配置功能：4组预设，自定义名称、保存当前数值、载入、导出/导入json备份<br>
+            8. 内嵌工具：神兵玉石升级材料、数值倍数换算（独立窗口隔离，互不干扰）
         </div>
     </div>
-
-    <script>
+<script>
         // 本地存储前缀
         const STORAGE_KEY_PREFIX = "scoreCalc_";
         // 配置存储KEY
         const CFG_STORE_KEY = "scoreCalc_configs";
-
         // 加成类型
         const BONUS = {
             BASE: 'base',       // 孙策 + 通用非元宝
@@ -1004,7 +872,6 @@
             ZHAOMU: 'zhaomu',   // + 招募
             LIANBING: 'lianbing' // + 训练士兵
         };
-
         // 每天的项目配置：初始值, 加成类型, 额外乘数
         const dayConfig = {
             1: [
@@ -1068,7 +935,6 @@
                 { name: '金色商车', init: 200000, bonus: BONUS.SHANGCHE, mult: 1 },
             ]
         };
-
         // 本地存储工具
         function getStoreKey(id) {
             return STORAGE_KEY_PREFIX + id;
@@ -1088,7 +954,6 @@
                 el.value = defaultVal;
             }
         }
-
         // 获取加成总和
         function getBonus(type) {
             const sunce = parseFloat(document.getElementById('bonus-sunce')?.value || 0);
@@ -1104,20 +969,18 @@
                 default: return base;
             }
         }
-
         // 练兵轮数
         function getTrainCount() {
             const trainEl = document.getElementById('train-count');
             return parseFloat(trainEl?.value || 0);
         }
-
         // 数字格式化
         function formatNum(num) {
             if (isNaN(num) || num === 0) return '0';
-            if (Number.isInteger(num)) return num.toLocaleString();
-            return num.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            // 四舍五入取整，不再保留小数
+            const intNum = Math.round(num);
+            return intNum.toLocaleString();
         }
-
         // 全局重计算
         function recalcAll() {
             for (let day = 1; day <= 6; day++) {
@@ -1130,7 +993,6 @@
                     const eEl = document.querySelector(`[data-calc="e${day}-${i}"]`);
                     const gEl = document.querySelector(`[data-calc="g${day}-${i}"]`);
                     if(!qtyEl || !cEl || !eEl || !gEl) return;
-
                     const bonus = getBonus(item.bonus);
                     const currentScore = item.init * (1 + bonus / 100);
                     const qty = parseFloat(qtyEl.value || 0);
@@ -1138,7 +1000,6 @@
                     if (mult === 'train') mult = getTrainCount();
                     const earned = currentScore * qty * mult;
                     sum += earned;
-
                     cEl.textContent = formatNum(currentScore);
                     eEl.textContent = formatNum(earned);
                     gEl.textContent = bonus.toFixed(1);
@@ -1153,7 +1014,6 @@
                 }
             }
         }
-
         // Tab切换
         document.querySelectorAll('.tab').forEach(tab => {
             tab.addEventListener('click', function() {
@@ -1164,15 +1024,12 @@
                 document.getElementById('day' + day).classList.add('active');
             });
         });
-
-        // ====================== 配置预设相关 修复全部BUG ======================
+        // ====================== 配置预设相关 ======================
         let configList = [];
-        // 安全读取本地配置
         try {
             const raw = localStorage.getItem(CFG_STORE_KEY);
             if(raw) configList = JSON.parse(raw);
         } catch (e) {}
-        // 兜底默认4组配置
         if(!Array.isArray(configList) || configList.length !== 4){
             configList = [
                 {name:"配置1",data:{}},
@@ -1181,7 +1038,6 @@
                 {name:"配置4",data:{}}
             ];
         }
-
         function saveConfigToLocal(){
             localStorage.setItem(CFG_STORE_KEY, JSON.stringify(configList));
         }
@@ -1205,7 +1061,6 @@
             });
             recalcAll();
         }
-        // 修复变量错误：configList
         function renderConfigNames(){
             for(let i=0;i<4;i++){
                 const nameInput = document.querySelector(`input[name="cfgName"][data-cfg="${i+1}"]`);
@@ -1213,7 +1068,6 @@
             }
         }
         function bindConfigEvent(){
-            // 修复选择器 input[name="cfgName"]
             document.querySelectorAll('input[name="cfgName"]').forEach(input=>{
                 input.addEventListener('input',()=>{
                     const idx = Number(input.dataset.cfg) - 1;
@@ -1221,7 +1075,6 @@
                     saveConfigToLocal();
                 });
             });
-            // 保存当前配置
             document.querySelectorAll('.btn-save').forEach(btn=>{
                 btn.addEventListener('click',()=>{
                     const idx = Number(btn.dataset.save) - 1;
@@ -1230,7 +1083,6 @@
                     alert(`已保存至【${configList[idx].name}】`);
                 });
             });
-            // 载入配置
             document.querySelectorAll('.btn-load').forEach(btn=>{
                 btn.addEventListener('click',()=>{
                     const idx = Number(btn.dataset.load) - 1;
@@ -1243,20 +1095,17 @@
                     alert(`已载入【${cfg.name}】`);
                 });
             });
-            // 导出配置JSON
             document.getElementById('exportCfg').addEventListener('click',()=>{
                 const blob = new Blob([JSON.stringify(configList,null,2)],{type:"application/json"});
                 const a = document.createElement("a");
                 a.href = URL.createObjectURL(blob);
-                a.download = "积分计算器配置.json";
+                a.download = "积分配置.json";
                 a.click();
                 URL.revokeObjectURL(a.href);
             });
-            // 导入按钮触发文件选择
             document.getElementById('importCfgBtn').addEventListener('click',()=>{
                 document.getElementById('importFile').click();
             });
-            // 读取导入文件
             document.getElementById('importFile').addEventListener('change',(e)=>{
                 const file = e.target.files[0];
                 if(!file) return;
@@ -1265,23 +1114,22 @@
                     try{
                         const json = JSON.parse(ev.target.result);
                         if(!Array.isArray(json) || json.length !==4){
-                            alert("配置文件格式错误，必须包含4组预设");
+                            alert("配置文件格式错误");
                             return;
                         }
                         configList = json;
                         saveConfigToLocal();
                         renderConfigNames();
-                        alert("配置导入成功");
+                        alert("导入成功");
                     }catch(err){
-                        alert("文件解析失败，不是有效JSON");
+                        alert("文件解析失败");
                     }
                 };
                 reader.readAsText(file);
                 e.target.value = "";
             });
-            // 重置所有数量按钮
             document.getElementById('resetQtyBtn').addEventListener('click', () => {
-                if (!confirm("确认清空全部天数的数量输入框？全局加成、已有积分、练兵轮数不会变动")) return;
+                if (!confirm("确认清空所有数量输入框？")) return;
                 const qtyInputs = document.querySelectorAll('input[data-qty^="d"]');
                 qtyInputs.forEach(input => {
                     input.value = "";
@@ -1289,28 +1137,25 @@
                     input.dispatchEvent(new Event('input'));
                 });
                 recalcAll();
-                //alert("所有项目数量已清零完成");
             });
         }
         function initConfig(){
             renderConfigNames();
             bindConfigEvent();
         }
-        // ====================== 初始化入口 ======================
+        // 初始化入口
         function init() {
             const allInputs = document.querySelectorAll('input[type="number"].cell-input');
             allInputs.forEach(input => {
-                if(!input) return;
                 let def = "";
                 if(input.id === "bonus-sunce") def = "30";
                 if(input.id === "bonus-fenghuo") def = "64";
-                if(input.id === "bonus-zhaomu") def = "52";
                 if(input.id === "bonus-shangche") def = "58";
+                if(input.id === "bonus-zhaomu") def = "52";
                 if(input.id === "bonus-jiasu") def = "55";
                 if(input.id === "bonus-lianbing") def = "52";
                 if(input.id === "bonus-feiyuanbao") def = "27.5";
                 if(input.id === "train-count") def = "801";
-                //if(input.dataset.qty === "f1") def = "13808336";
                 loadInput(input, def);
                 input.addEventListener('input', function(){
                     saveInput(this);
@@ -1321,6 +1166,13 @@
             initConfig();
         }
         init();
-    </script>
+        // 接收子页面高度，自动调整iframe
+        window.addEventListener('message', function(event) {
+            const iframe = document.querySelector('.iframe-wrap iframe');
+            if (iframe && event.data?.iframeHeight) {
+                iframe.style.height = event.data + 'px';
+            }
+        });
+</script>
 </body>
 </html>
