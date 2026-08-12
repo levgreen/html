@@ -231,26 +231,42 @@
             font-size: 16px;
             margin-bottom: 12px;
         }
-        .iframe-wrap {
-            margin: 15px 20px;
-            padding: 16px;
-            background: #fffef0;
-            border-radius: 6px;
-            border: 1px solid #ffdd99;
-        }
-        .iframe-wrap h3 {
-            font-size: 16px;
-            margin-bottom: 12px;
-        }
         .iframe-wrap iframe {
             width: 100%;
             border: none;
             min-height: 360px;
             height: auto;
         }
+        /* 云端配置模块样式 */
+        .cloud-config {
+            margin-top:12px;
+            padding:10px;
+            border-top:1px dashed #ffcc80;
+        }
+        .cloud-config h4 {
+            font-size:14px;
+            margin-bottom:8px;
+            color:#b37200;
+        }
+        .cloud-input {
+            width:220px;
+            padding:5px;
+            border:1px solid #ccc;
+            border-radius:3px;
+        }
+        .btn-cloud-get { background:#039be5; color:#fff; }
+        .btn-cloud-save { background:#00897b; color:#fff; }
+        .cloud-tip {
+            font-size:12px;
+            color:#996600;
+            margin-top:6px;
+        }
         @media (max-width: 768px) {
             .iframe-wrap iframe {
                 min-height: 360px;
+            }
+            .cloud-input {
+                width:100%;
             }
         }
     </style>
@@ -299,6 +315,21 @@
                 <button class="config-btn btn-import" id="importCfgBtn">载入配置文件</button>
                 <input type="file" class="config-file-input" id="importFile" accept=".json">
                 <button class="config-btn" id="resetQtyBtn">重置所有数量</button>
+            </div>
+
+            <!-- 新增 JsonBin 云端配置区域 -->
+            <div class="cloud-config">
+                <h4>JsonBin 云端同步</h4>
+                <div class="config-row">
+                 <!--   <input class="cloud-input" id="jsonbin-binid" placeholder="Bin ID" /> ID输入默认为空 -->
+                    <input class="cloud-input" id="jsonbin-binid" placeholder="Bin ID" value="6a7c465cda38895dfed9d1a3" />
+                    <input class="cloud-input" id="jsonbin-secret" placeholder="Secret Key（编辑权限）" />
+                    <button class="config-btn btn-cloud-get" id="cloudGetBtn">拉取云端配置</button>
+                    <button class="config-btn btn-cloud-save" id="cloudSaveBtn">上传保存到云端</button>
+                </div>
+                <div class="cloud-tip">
+                    使用说明：前往 jsonbin.io 创建bin，填写Bin ID；上传保存需要Secret Key，仅拉取不需要密钥。浏览器跨域使用公共CORS代理。
+                </div>
             </div>
         </div>
         <div class="iframe-wrap">
@@ -855,7 +886,8 @@
             5. 总积分 = 已有积分 + 可获取积分<br>
             6. 所有输入数据自动本地保存，关闭/刷新页面下次打开自动恢复<br>
             7. 配置功能：4组预设，自定义名称、保存当前数值、载入、导出/导入json备份<br>
-            8. 内嵌工具：神兵玉石升级材料、数值倍数换算（独立窗口隔离，互不干扰）
+            8. 内嵌工具：神兵玉石升级材料、数值倍数换算（独立窗口隔离，互不干扰）<br>
+            9. 新增JsonBin云端同步：支持跨设备同步4组配置，拉取无需密钥，上传保存需要Secret Key
         </div>
     </div>
 <script>
@@ -863,6 +895,8 @@
         const STORAGE_KEY_PREFIX = "scoreCalc_";
         // 配置存储KEY
         const CFG_STORE_KEY = "scoreCalc_configs";
+        // JsonBin 常量
+        const JSONBIN_BASE = "https://api.jsonbin.io/v3/b";
         // 加成类型
         const BONUS = {
             BASE: 'base',       // 孙策 + 通用非元宝
@@ -1024,6 +1058,84 @@
                 document.getElementById('day' + day).classList.add('active');
             });
         });
+
+        // ====================== JsonBin 云端同步函数 ======================
+        async function cloudFetchConfig() {
+            const binId = document.getElementById('jsonbin-binid').value.trim();
+            if (!binId) {
+                alert("请填写Bin ID");
+                return;
+            }
+            // 无代理，直接原生接口地址
+            const url = `${JSONBIN_BASE}/${binId}`;
+            try {
+                const res = await fetch(url, { 
+                    method: "GET",
+                    headers: {
+                        "Accept": "application/json"
+                    }
+                });
+                if (!res.ok) throw new Error(`请求失败 ${res.status}`);
+                const json = await res.json();
+                const remoteData = json.record;
+                if (!Array.isArray(remoteData) || remoteData.length !== 4) {
+                    alert("云端配置格式错误，必须为4组配置数组");
+                    return;
+                }
+                // 覆盖本地4组预设
+                configList = remoteData;
+                saveConfigToLocal();
+                renderConfigNames();
+                // 直接加载配置1，无弹窗
+                fillAllInput(configList[0].data);
+                alert("拉取云端配置成功，已自动载入配置1数据");
+            } catch (err) {
+                console.error(err);
+                if(err.message.includes("CORS") || err.message.includes("origin")){
+                    alert("请求失败：浏览器跨域拦截！\n解决方式：使用serve本地服务打开页面 / 关闭浏览器安全策略");
+                }else{
+                    alert("拉取失败：" + err.message + "\n1.确认Bin公开可读 2.BinID无误");
+                }
+            }
+        }
+        async function cloudSaveConfig() {
+            const binId = document.getElementById('jsonbin-binid').value.trim();
+            const secretKey = document.getElementById('jsonbin-secret').value.trim();
+            if (!binId || !secretKey) {
+                alert("请填写Bin ID和Secret Key");
+                return;
+            }
+            const payload = JSON.parse(JSON.stringify(configList));
+            // 原生接口，无代理
+            const url = `${JSONBIN_BASE}/${binId}`;
+            try {
+                const res = await fetch(url, {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-Master-Key": secretKey
+                    },
+                    body: JSON.stringify(payload)
+                });
+                if (!res.ok) {
+                    const errText = await res.text();
+                    throw new Error(`HTTP ${res.status}: ${errText}`);
+                }
+                alert("上传保存到JsonBin云端成功！");
+            } catch (err) {
+                console.error(err);
+                if(err.message.includes("CORS") || err.message.includes("origin")){
+                    alert("上传失败：浏览器跨域拦截！\n解决方式：使用serve本地服务打开页面 / 关闭浏览器安全策略");
+                }else{
+                    alert("上传失败：" + err.message + "\n1.Secret Key权限正确 2.Bin ID无误");
+                }
+            }
+        }
+        function bindCloudSyncEvents() {
+            document.getElementById("cloudGetBtn").addEventListener("click", cloudFetchConfig);
+            document.getElementById("cloudSaveBtn").addEventListener("click", cloudSaveConfig);
+        }
+
         // ====================== 配置预设相关 ======================
         let configList = [];
         try {
@@ -1106,6 +1218,7 @@
             document.getElementById('importCfgBtn').addEventListener('click',()=>{
                 document.getElementById('importFile').click();
             });
+
             document.getElementById('importFile').addEventListener('change',(e)=>{
                 const file = e.target.files[0];
                 if(!file) return;
@@ -1117,10 +1230,19 @@
                             alert("配置文件格式错误");
                             return;
                         }
+                        // 覆盖本地全部4组预设
                         configList = json;
                         saveConfigToLocal();
                         renderConfigNames();
-                        alert("导入成功");
+                        // 新增：询问是否自动载入第1组配置到页面
+                        //alert("本地导入配置成功，已自动载入配置1数据");
+                        fillAllInput(configList[0].data);
+                        alert("导入完成，已自动载入配置1数据");
+                        //if(confirm("导入成功！是否将【配置1】的数据加载到当前页面？")){
+                        //    const cfg = configList[0];
+                        //    fillAllInput(cfg.data);
+                        //}
+                        //alert("导入成功");
                     }catch(err){
                         alert("文件解析失败");
                     }
@@ -1142,6 +1264,7 @@
         function initConfig(){
             renderConfigNames();
             bindConfigEvent();
+            bindCloudSyncEvents(); // 新增：绑定云端同步按钮事件
         }
         // 初始化入口
         function init() {
