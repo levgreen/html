@@ -2,23 +2,29 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <!-- 强化移动端适配，禁止缩放溢出 -->
+    <!-- 移动端禁止缩放，适配手机宽度 -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>神兵玉石换算工具</title>
     <style>
+/* 全局通用重置：清除内外边距、统一盒模型、默认字体 */
 *{margin:0;padding:0;box-sizing:border-box;font-family:"Microsoft Yahei",sans-serif;}
-body{background:#fff;padding:8px; /* 缩小页面整体边距 */}
+/* 页面整体背景+内边距 */
+body{background:#fff;padding:8px;}
+/* 页面最大宽度容器，居中 */
 .wrap{max-width:100%;margin:0 auto;}
+/* 页面大标题样式 */
 h1{text-align:center;margin-bottom:10px;font-size:17px;color:#2c3e50;}
-.main-container{display:flex;gap:12px;flex-wrap:wrap; /* 缩小区块间隙 */}
-/* 关键：缩小最小宽度260px，解决手机横向滚动 */
+/* 四大功能块外层弹性容器，自动换行、块间距 */
+.main-container{display:flex;gap:12px;flex-wrap:wrap;}
+/* 单个功能卡片通用样式：弹性均分宽度、最小宽度防挤压、边框圆角内边距 */
 .calc-block{
     flex:1;
     min-width:260px;
     border:1px solid #eee;
     border-radius:6px;
-    padding:12px 14px; /* 缩小内边距 */
+    padding:12px 14px;
 }
+/* 每个卡片内小标题样式，底部分割虚线 */
 .block-title{
     font-size:15px;
     font-weight:bold;
@@ -27,31 +33,33 @@ h1{text-align:center;margin-bottom:10px;font-size:17px;color:#2c3e50;}
     border-bottom:1px solid #eee;
     padding-bottom:5px;
 }
-/* 输入行横向并排布局 */
+/* 单行横向标签+输入框通用行 */
 .input-row{
     display:flex;
     align-items:center;
     gap:10px;
     margin-bottom:8px;
 }
-/* 双输入并排容器（当前/目标等级一行左右排列） */
+/* 双选择框并排行（神兵/玉石等级选择行） */
 .input-row-double{
     display:flex;
     gap:8px;
     width:100%;
 }
+/* 输入框+标签纵向容器 */
 .input-col{
     flex:1;
     display:flex;
     align-items:center;
     gap:5px;
 }
+/* 小标签文字样式，禁止自动换行 */
 .input-col label{
     font-size:12px;
     color:#666;
     white-space:nowrap;
 }
-/* 缩小输入框，适配5位数字不溢出 */
+/* 下拉选择框、数值输入框统一宽高内边距边框 */
 select, input[type=number].cell-input{
     width:68px;
     padding:3px;
@@ -59,11 +67,12 @@ select, input[type=number].cell-input{
     border-radius:4px;
     font-size:12px;
 }
+/* 黄色底色输入框（所有可输入数值框专用） */
 .cell-input{
     border:1px solid #e0c060;
     background:#fff9c4;
 }
-/* 三数值一行左右排列容器 */
+/* 原三列并排样式作废，时间模块改用垂直布局 */
 .triple-row{
     display:flex;
     gap:6px;
@@ -80,40 +89,42 @@ select, input[type=number].cell-input{
     font-size:11px;
     color:#666;
 }
-/* 结果区块统一容器 */
+/* 结果区域顶部虚线分隔 */
 .result-wrap{
     margin:10px 0;
     padding-top:8px;
     border-top:1px dashed #eee;
 }
+/* 灰色只读结果输出框统一样式 */
+.readout{
+    width:68px;
+    padding:3px;
+    border:1px solid #e0e0e0;
+    background:#f5f5f5;
+    pointer-events:none;
+    font-family:Consolas;
+    text-align:center;
+    font-size:12px;
+}
+/* 单行标签+结果框布局（神兵玉石材料输出行） */
 .result-row{
     display:flex;
     align-items:center;
     gap:8px;
     margin-bottom:6px;
 }
-/* 固定标签宽度，结果框对齐不漂移 */
+/* 结果左侧固定宽度标签 */
 .result-row label{
     flex: 0 0 70px;
     font-size:12px;
     color:#666;
     white-space:nowrap;
 }
-/* 缩小结果框，宽度与按钮一致 */
-.readout{
-    width:140px;
-    padding:3px;
-    border:1px solid #e0e0e0;
-    background:#f5f5f5;
-    pointer-events:none;
-    font-family:Consolas;
-    text-align:left;
-    font-size:12px;
-}
-/* 缩小计算按钮，固定宽度 */
+/* 全局计算按钮基础样式：短宽度、蓝色背景 */
 .calc-btn{
     display:block;
-    width:140px;
+    width:80px;
+    max-width:100%;
     padding:5px;
     background:#4a90d9;
     color:#fff;
@@ -123,9 +134,9 @@ select, input[type=number].cell-input{
     cursor:pointer;
     margin:4px auto 0;
 }
+/* 按钮悬浮加深蓝色 */
 .calc-btn:hover{background:#3a7bc0;}
-
-/* 简易计算器样式 */
+/* 简易计算器顶部输入显示屏 */
 .calc-display{
     width:100%;
     padding:8px;
@@ -135,44 +146,139 @@ select, input[type=number].cell-input{
     border:1px solid #ddd;
     border-radius:4px;
 }
+/* 计算器4列网格布局 */
 .calc-btn-grid{
     display:grid;
     grid-template-columns: repeat(4, 1fr);
     gap:4px;
 }
+/* 计算器数字基础按钮 */
 .calc-num-btn{
     padding:8px;
     border:none;
     border-radius:4px;
-    background:#f0f0f0;
+    background:#f0f0;
     font-size:14px;
     cursor:pointer;
 }
+/* 计算器加减乘除运算符按钮蓝色 */
 .calc-op-btn{
     background:#4a90d9;
     color:#fff;
 }
+/* 计算器清空按钮红色 */
 .calc-clear{
     background:#e74c3c;
     color:#fff;
 }
-
-/* 手机屏幕小于900px强制单列，彻底消除横向滚动 */
+/* 倍数换算外层：取消wrap，禁止自动换行，空间不足会整体缩小不换行 */
+.multi-main-row{
+    display:flex;
+    flex-wrap:nowrap;
+    justify-content:flex-start;
+    align-items:flex-start;
+    gap:12px;
+    margin-bottom:8px;
+}
+/* 左侧「数值列+结果列」横向容器 */
+.multi-left-cols{
+    display:flex;
+    gap:12px;
+}
+/* 单独一列（数值 / 结果）垂直容器 */
+.multi-col{
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+}
+/* 数值/结果列上方标签文字 */
+.multi-col label{
+    font-size:12px;
+    color:#222;
+}
+/* 三行输入框垂直堆叠容器 */
+.multi-rows-stack{
+    display:flex;
+    flex-direction:column;
+    gap:5px;
+}
+/* 右侧倍数下拉+按钮垂直容器 */
+.multi-right-wrap{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:6px;
+}
+/* 倍数下拉上方标签 */
+.multi-right-wrap label{
+    font-size:12px;
+    color:#222;
+}
+/* 倍数选择下拉窄宽度 */
+.multi-right-wrap select{
+    width:60px;
+    max-width:100%;
+}
+/* 倍数换算按钮取消上下外边距，紧贴下拉框 */
+.multi-right-wrap .calc-btn{
+    margin:0;
+    width:80px;
+}
+/* 时间转换专用容器：整体左右布局，左侧垂直输入，右侧垂直结果 */
+.time-wrap{
+    display:flex;
+    gap:12px;
+    align-items:flex-start;
+}
+/* 时间左侧：天/小时/分钟 垂直排列，标签左，输入右 */
+.time-left{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+}
+.time-item{
+    display:flex;
+    align-items:center;
+    gap:6px;
+}
+.time-item label{
+    font-size:12px;
+    color:#666;
+    width:32px;
+}
+/* 时间右侧：总分钟标签在上，输入在下，按钮底部居中 */
+.time-right{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:6px;
+}
+.time-right label{
+    font-size:12px;
+    color:#666;
+}
+/* 手机窄屏适配：所有大模块垂直单列 */
 @media (max-width:900px) {
     .main-container{flex-direction:column;gap:12px;}
     .input-row,.result-row{gap:6px;margin-bottom:6px;}
     .input-row-double{gap:4px;}
     .triple-row{gap:3px;}
+    /* 窄屏倍数模块强制不换行，整体缩小适配 */
+    .multi-main-row{flex-wrap:nowrap;overflow-x:auto;}
+    .multi-left-cols{justify-content:center;}
+    /* 时间模块手机保持左右布局不堆叠 */
+    .time-wrap{justify-content:center;}
 }
     </style>
 </head>
 <body>
 <div class="wrap">
-    <h1>神兵/玉石/数值倍数换算 + 简易计算器</h1>
+    <h1>神兵/玉石/数值/时间换算 + 简易计算器</h1>
     <div class="main-container">
-        <!-- 神兵升级 -->
+        <!-- 模块1：神兵升级材料计算器 -->
         <div class="calc-block">
             <div class="block-title">神兵升级消耗</div>
+            <!-- 神兵当前等级、目标等级下拉选择框 -->
             <div class="input-row-double">
                 <div class="input-col">
                     <label>当前等级</label>
@@ -183,6 +289,7 @@ select, input[type=number].cell-input{
                     <select id="merge-tarLv"></select>
                 </div>
             </div>
+            <!-- 神兵三种材料只读输出框 -->
             <div class="result-wrap">
                 <div class="result-row">
                     <label>紫檀木</label>
@@ -197,12 +304,13 @@ select, input[type=number].cell-input{
                     <input class="readout" id="merge-lapisOut" readonly>
                 </div>
             </div>
+            <!-- 神兵计算按钮 id=merge-calcBtn -->
             <button class="calc-btn" id="merge-calcBtn">计算材料</button>
         </div>
-
-        <!-- 玉石升级 -->
+        <!-- 模块2：玉石升级材料计算器 -->
         <div class="calc-block">
             <div class="block-title">玉石升级消耗</div>
+            <!-- 玉石当前、目标等级下拉 -->
             <div class="input-row-double">
                 <div class="input-col">
                     <label>当前等级</label>
@@ -213,6 +321,7 @@ select, input[type=number].cell-input{
                     <select id="merge-jadeTarLv"></select>
                 </div>
             </div>
+            <!-- 玉石材料输出框 -->
             <div class="result-wrap">
                 <div class="result-row">
                     <label>璞玉</label>
@@ -223,83 +332,103 @@ select, input[type=number].cell-input{
                     <input class="readout" id="merge-knifeOut" readonly>
                 </div>
             </div>
+            <!-- 玉石计算按钮 id=merge-jadeCalcBtn -->
             <button class="calc-btn" id="merge-jadeCalcBtn">计算材料</button>
         </div>
-
-        <!-- 倍数换算 -->
+        <!-- 模块3：数值倍数换算 + 时间转换 合并区块 -->
         <div class="calc-block">
-            <div class="block-title">数值倍数换算</div>
-            <div class="triple-row">
-                <div class="triple-col">
-                    <label>数值A</label>
-                    <input type="number" class="cell-input" id="merge-val1">
+            <div class="block-title">数值&时间换算</div>
+            <!-- 倍数换算区域：取消自动换行 nowrap -->
+            <div class="multi-main-row">
+                <div class="multi-left-cols">
+                    <!-- 三行数值输入框 -->
+                    <div class="multi-col">
+                        <label>数值</label>
+                        <div class="multi-rows-stack">
+                            <input type="number" class="cell-input" id="merge-val1">
+                            <input type="number" class="cell-input" id="merge-val2">
+                            <input type="number" class="cell-input" id="merge-val3">
+                        </div>
+                    </div>
+                    <!-- 三行倍数结果输出框 -->
+                    <div class="multi-col">
+                        <label>结果</label>
+                        <div class="multi-rows-stack">
+                            <input class="readout" id="merge-res1" readonly>
+                            <input class="readout" id="merge-res2" readonly>
+                            <input class="readout" id="merge-res3" readonly>
+                        </div>
+                    </div>
                 </div>
-                <div class="triple-col">
-                    <label>数值B</label>
-                    <input type="number" class="cell-input" id="merge-val2">
-                </div>
-                <div class="triple-col">
-                    <label>数值C</label>
-                    <input type="number" class="cell-input" id="merge-val3">
-                </div>
-            </div>
-            <div class="input-row">
-                <label>倍数</label>
-                <select id="merge-timesSel">
-                    <option value="1">1倍</option>
-                    <option value="2">2倍</option>
-                    <option value="3">3倍</option>
-                    <option value="4">4倍</option>
-                    <option value="5">5倍</option>
-                    <option value="6">6倍</option>
-                    <option value="7">7倍</option>
-                    <option value="8">8倍</option>
-                    <option value="9">9倍</option>
-                    <option value="10">10倍</option>
-                </select>
-            </div>
-            <div class="result-wrap">
-                <div class="result-row">
-                    <label>结果A</label>
-                    <input class="readout" id="merge-res1" readonly>
-                </div>
-                <div class="result-row">
-                    <label>结果B</label>
-                    <input class="readout" id="merge-res2" readonly>
-                </div>
-                <div class="result-row">
-                    <label>结果C</label>
-                    <input class="readout" id="merge-res3" readonly>
+                <!-- 倍数选择下拉 + 倍数换算按钮 -->
+                <div class="multi-right-wrap">
+                    <label>倍数</label>
+                    <select id="merge-timesSel">
+                        <option value="1">1倍</option>
+                        <option value="2">2倍</option>
+                        <option value="3">3倍</option>
+                        <option value="4">4倍</option>
+                        <option value="5">5倍</option>
+                        <option value="6">6倍</option>
+                        <option value="7">7倍</option>
+                        <option value="8">8倍</option>
+                        <option value="9">9倍</option>
+                        <option value="10">10倍</option>
+                    </select>
+                    <!-- 倍数换算按钮 id=merge-multiCalcBtn -->
+                    <button class="calc-btn" id="merge-multiCalcBtn">倍数换算</button>
                 </div>
             </div>
-            <button class="calc-btn" id="merge-multiCalcBtn">换算</button>
+            <!-- 分割虚线 -->
+            <div style="margin:10px 0;border-top:1px dashed #eee;"></div>
+            <!-- 时间转换区域：垂直排布，标签左输入框右；右侧总分钟标签在上输出在下 -->
+            <div class="time-wrap">
+                <!-- 左侧：天/小时/分钟 垂直，文字标签在输入框左侧 -->
+                <div class="time-left">
+                    <div class="time-item">
+                        <label>天</label>
+                        <input type="number" class="cell-input" id="time-day" min="0" value="0">
+                    </div>
+                    <div class="time-item">
+                        <label>小时</label>
+                        <input type="number" class="cell-input" id="time-hour" min="0" value="0">
+                    </div>
+                    <div class="time-item">
+                        <label>分钟</label>
+                        <input type="number" class="cell-input" id="time-min" min="0" value="0">
+                    </div>
+                </div>
+                <!-- 右侧：总分钟文字在上，输出框在下，按钮在输出框下方 -->
+                <div class="time-right">
+                    <label>总分钟</label>
+                    <input class="readout" id="time-total" readonly>
+                    <button class="calc-btn" id="time-calc-btn">计算总分钟</button>
+                </div>
+            </div>
         </div>
-
-        <!-- 简易计算器模块 -->
+        <!-- 模块4：独立简易计算器 -->
         <div class="calc-block">
             <div class="block-title">简易计算器</div>
+            <!-- 计算器显示屏幕 -->
             <input type="text" class="calc-display" id="calc-display" readonly value="">
+            <!-- 计算器所有数字/运算符按钮 -->
             <div class="calc-btn-grid">
                 <button class="calc-num-btn calc-clear" data-val="C">C</button>
                 <button class="calc-num-btn" data-val="/">/</button>
                 <button class="calc-num-btn" data-val="*">×</button>
                 <button class="calc-num-btn calc-op-btn" data-val="-">-</button>
-
                 <button class="calc-num-btn" data-val="7">7</button>
                 <button class="calc-num-btn" data-val="8">8</button>
                 <button class="calc-num-btn" data-val="9">9</button>
                 <button class="calc-num-btn calc-op-btn" data-val="+">+</button>
-
                 <button class="calc-num-btn" data-val="4">4</button>
                 <button class="calc-num-btn" data-val="5">5</button>
                 <button class="calc-num-btn" data-val="6">6</button>
                 <button class="calc-num-btn" data-val=".">.</button>
-
                 <button class="calc-num-btn" data-val="1">1</button>
                 <button class="calc-num-btn" data-val="2">2</button>
                 <button class="calc-num-btn" data-val="3">3</button>
                 <button class="calc-num-btn calc-op-btn" data-val="=">=</button>
-
                 <button class="calc-num-btn" data-val="0" style="grid-column: span 3;">0</button>
                 <button class="calc-num-btn" data-val="back">←</button>
             </div>
@@ -307,125 +436,20 @@ select, input[type=number].cell-input{
     </div>
 </div>
 <script>
-// 神兵等级数据：仅保留数组结构，内容清空自行补充
+/* ===================== 全局数据定义 ===================== */
+// merge_levelData：神兵等级材料数组，存放每一级所需紫檀木/精金/青金石，当前空白，用户自行填充
 const merge_levelData = [
-    // 示例格式：{name:"绿色0", wood:0, stone:0, lapis:0},
-    {name:"绿色0", wood:0, stone:0, lapis:0},
-    {name:"绿色1", wood:1000, stone:50, lapis:0},
-    {name:"绿色2", wood:1500, stone:75, lapis:0},
-    {name:"绿色3", wood:2000, stone:100, lapis:0},
-    {name:"绿色4", wood:2500, stone:125, lapis:0},
-    {name:"绿色5", wood:3000, stone:150, lapis:0},
-    {name:"蓝色1", wood:3500, stone:175, lapis:0},
-    {name:"蓝色2", wood:4000, stone:200, lapis:0},
-    {name:"蓝色3", wood:4500, stone:225, lapis:0},
-    {name:"蓝色4", wood:5000, stone:250, lapis:0},
-    {name:"蓝色5", wood:5500, stone:275, lapis:0},
-    {name:"紫色1", wood:6000, stone:300, lapis:150},
-    {name:"紫色2", wood:6500, stone:325, lapis:160},
-    {name:"紫色3", wood:7000, stone:350, lapis:170},
-    {name:"紫色4", wood:7500, stone:375, lapis:180},
-    {name:"紫色5", wood:8000, stone:400, lapis:180},
-    {name:"紫色6", wood:8500, stone:425, lapis:190},
-    {name:"紫色7", wood:9000, stone:450, lapis:200},
-    {name:"紫色8", wood:9500, stone:475, lapis:200},
-    {name:"紫色9", wood:10000, stone:500, lapis:210},
-    {name:"紫色10", wood:10500, stone:525, lapis:220},
-    {name:"金色1", wood:11000, stone:550, lapis:220},
-    {name:"金色2", wood:12000, stone:600, lapis:230},
-    {name:"金色3", wood:13000, stone:650, lapis:250},
-    {name:"金色4", wood:14000, stone:700, lapis:260},
-    {name:"金色5", wood:15000, stone:750, lapis:270},
-    {name:"金色6", wood:1600, stone:800, lapis:280},
-    {name:"金色7", wood:17000, stone:850, lapis:290},
-    {name:"金色8", wood:18000, stone:900, lapis:300},
-    {name:"金色9", wood:19000, stone:950, lapis:300},
-    {name:"金色10", wood:20000, stone:1000, lapis:310},
-    {name:"金色11", wood:21000, stone:1050, lapis:320},
-    {name:"金色12", wood:22000, stone:1100, lapis:320},
-    {name:"金色13", wood:23000, stone:1150, lapis:320},
-    {name:"金色14", wood:24000, stone:1200, lapis:330},
-    {name:"金色15", wood:25000, stone:1250, lapis:330},
-    {name:"金色16", wood:26000, stone:1300, lapis:330},
-    {name:"金色17", wood:27000, stone:1350, lapis:340},
-    {name:"金色18", wood:28000, stone:1400, lapis:350},
-    {name:"金色19", wood:29000, stone:1450, lapis:360},
-    {name:"金色20", wood:30000, stone:1500, lapis:360},
-    {name:"金色21", wood:31000, stone:1550, lapis:360},
-    {name:"金色22", wood:32000, stone:1600, lapis:380},
-    {name:"金色23", wood:3300, stone:1650, lapis:380},
-    {name:"金色24", wood:34000, stone:1700, lapis:390},
-    {name:"金色25", wood:3500, stone:1750, lapis:390},
-    {name:"金色26", wood:36000, stone:1800, lapis:400},
-    {name:"金色27", wood:37000, stone:1850, lapis:410},
-    {name:"金色28", wood:38000, stone:1900, lapis:420},
-    {name:"金色29", wood:39000, stone:1950, lapis:430},
-    {name:"金色30", wood:40000, stone:2000, lapis:440},
+    // {name:"", wood:0, stone:0, lapis:0},
 ];
-
-// 玉石等级数据：仅保留数组结构，内容清空自行补充
+// merge_jadeData：玉石等级材料数组，存放每一级璞玉/琢玉刀，空白待填充
 const merge_jadeData = [
-    // 示例格式：{name:"等级0（初始）", jade:0, knife:0},
-    {name:"等级-0", jade:0, knife:0},
-    {name:"精良‑1", jade:10, knife:2},
-    {name:"精良‑2", jade:12, knife:4},
-    {name:"精良‑3", jade:14, knife:6},
-    {name:"精良‑4", jade:16, knife:8},
-    {name:"精良‑5", jade:18, knife:10},
-    {name:"稀有‑6", jade:20, knife:12},
-    {name:"稀有‑7", jade:24, knife:16},
-    {name:"稀有‑8", jade:28, knife:20},
-    {name:"稀有‑9", jade:32, knife:30},
-    {name:"稀有‑10", jade:36, knife:40},
-    {name:"史诗‑11", jade:50, knife:60},
-    {name:"史诗‑12", jade:60, knife:100},
-    {name:"史诗‑13", jade:70, knife:140},
-    {name:"史诗‑14", jade:80, knife:180},
-    {name:"史诗‑15", jade:90, knife:220},
-    {name:"史诗‑16", jade:100, knife:240},
-    {name:"史诗‑17", jade:140, knife:240},
-    {name:"史诗‑18", jade:180, knife:260},
-    {name:"史诗‑19", jade:220, knife:260},
-    {name:"史诗‑20", jade:260, knife:280},
-    {name:"传奇‑21", jade:300, knife:300},
-    {name:"传奇‑22", jade:340, knife:320},
-    {name:"传奇‑23", jade:380, knife:340},
-    {name:"传奇‑24", jade:420, knife:360},
-    {name:"传奇‑25", jade:460, knife:380},
-    {name:"无双‑26", jade:500, knife:400},
-    {name:"无双‑26‑1", jade:132, knife:97},
-    {name:"无双‑26‑2", jade:135, knife:99},
-    {name:"无双‑26‑3", jade:140, knife:103},
-    {name:"无双‑27", jade:143, knife:105},
-    {name:"无双‑27‑1", jade:144, knife:98},
-    {name:"无双‑27‑2", jade:147, knife:100},
-    {name:"无双‑27‑3", jade:153, knife:105},
-    {name:"无双‑28", jade:156, knife:108},
-    {name:"无双‑29‑1", jade:168, knife:101},
-    {name:"无双‑29‑2", jade:172, knife:103},
-    {name:"无双‑29‑3", jade:179, knife:107},
-    {name:"无双‑30‑2", jade:184, knife:104},
-    {name:"无双‑30‑3", jade:191, knife:108},
-    {name:"无双‑31‑0", jade:195, knife:111},
-    {name:"无双‑31‑1", jade:192, knife:103},
-    {name:"无双‑31‑2", jade:196, knife:105},
-    {name:"无双‑31‑3", jade:204, knife:110},
-    {name:"无双‑32‑0", jade:208, knife:112},
-    {name:"无双‑32‑1", jade:204, knife:104},
-    {name:"无双‑32‑2", jade:204, knife:107},
-    {name:"无双‑32‑3", jade:217, knife:111},
-    {name:"无双‑33‑0", jade:221, knife:113},
-    {name:"无双‑33‑1", jade:216, knife:106},
-    {name:"无双‑33‑2", jade:221, knife:108},
-    {name:"无双‑33‑3", jade:230, knife:112},
-    {name:"无双‑34‑0", jade:234, knife:114},
-    {name:"无双‑34‑1", jade:228, knife:107},
-    {name:"无双‑34‑2", jade:233, knife:109},
-    {name:"无双‑34‑3", jade:242, knife:113},
-    {name:"无双‑35‑0", jade:247, knife:116}
+    // {name:"", jade:0, knife:0},
 ];
-
+/* ===================== 初始化函数 initMerge ===================== */
+// 作用：页面加载时，自动给神兵、玉石下拉框填充所有等级选项
+// 绑定元素：#merge-curLv、#merge-tarLv（神兵下拉）、#merge-jadeCurLv、#merge-jadeTarLv（玉石下拉）
 (function initMerge(){
+    // 神兵下拉填充
     const curSel = document.getElementById("merge-curLv");
     const tarSel = document.getElementById("merge-tarLv");
     merge_levelData.forEach((item,idx)=>{
@@ -435,7 +459,7 @@ const merge_jadeData = [
         curSel.appendChild(opt.cloneNode(true));
         tarSel.appendChild(opt);
     })
-
+    // 玉石下拉填充
     const jadeCurSel = document.getElementById("merge-jadeCurLv");
     const jadeTarSel = document.getElementById("merge-jadeTarLv");
     merge_jadeData.forEach((item,idx)=>{
@@ -446,11 +470,15 @@ const merge_jadeData = [
         jadeTarSel.appendChild(opt);
     })
 })();
-
-// 神兵计算
+/* ===================== 神兵计算点击事件 ===================== */
+// 绑定按钮：#merge-calcBtn
+// 读取输入：#merge-curLv 当前等级、#merge-tarLv 目标等级
+// 输出结果：#merge-woodOut 紫檀木、#merge-stoneOut 精金、#merge-lapisOut 青金石
+// 逻辑：遍历当前+1级到目标级，累加所有材料总和
 document.getElementById("merge-calcBtn").onclick = function(){
     let cur = Number(document.getElementById("merge-curLv").value);
     let tar = Number(document.getElementById("merge-tarLv").value);
+    // 目标等级≤当前等级，提示错误
     if(tar <= cur){
         document.getElementById("merge-woodOut").value = "等级错误";
         document.getElementById("merge-stoneOut").value = "等级错误";
@@ -463,12 +491,15 @@ document.getElementById("merge-calcBtn").onclick = function(){
         sumStone += merge_levelData[i].stone;
         sumLapis += merge_levelData[i].lapis;
     }
+    // 数字千分位格式化输出
     document.getElementById("merge-woodOut").value = sumWood.toLocaleString();
     document.getElementById("merge-stoneOut").value = sumStone.toLocaleString();
     document.getElementById("merge-lapisOut").value = sumLapis.toLocaleString();
 }
-
-// 玉石计算
+/* ===================== 玉石计算点击事件 ===================== */
+// 绑定按钮：#merge-jadeCalcBtn
+// 读取输入：#merge-jadeCurLv 当前玉石等级、#merge-jadeTarLv 目标玉石等级
+// 输出结果：#merge-jadeOut 璞玉、#merge-knifeOut 琢玉刀
 document.getElementById("merge-jadeCalcBtn").onclick = function(){
     let cur = Number(document.getElementById("merge-jadeCurLv").value);
     let tar = Number(document.getElementById("merge-jadeTarLv").value);
@@ -485,28 +516,47 @@ document.getElementById("merge-jadeCalcBtn").onclick = function(){
     document.getElementById("merge-jadeOut").value = sumJade.toLocaleString();
     document.getElementById("merge-knifeOut").value = sumKnife.toLocaleString();
 }
-
-// 倍数换算
+/* ===================== 数值倍数换算点击事件 ===================== */
+// 绑定按钮：#merge-multiCalcBtn
+// 读取输入：#merge-val1 / #merge-val2 / #merge-val3 三组原始数值、#merge-timesSel 倍数下拉
+// 输出结果：#merge-res1 / #merge-res2 / #merge-res3 三组相乘后结果
 document.getElementById("merge-multiCalcBtn").onclick = function(){
-    let v1 = Number(document.getElementById("merge-val1").value)||0;
-    let v2 = Number(document.getElementById("merge-val2").value)||0;
-    let v3 = Number(document.getElementById("merge-val3").value)||0;
+    let v1 = Number(document.getElementById("merge-val1").value) || 0;
+    let v2 = Number(document.getElementById("merge-val2").value) || 0;
+    let v3 = Number(document.getElementById("merge-val3").value) || 0;
     let multiple = Number(document.getElementById("merge-timesSel").value);
     document.getElementById("merge-res1").value = (v1 * multiple).toLocaleString();
     document.getElementById("merge-res2").value = (v2 * multiple).toLocaleString();
     document.getElementById("merge-res3").value = (v3 * multiple).toLocaleString();
 }
-
-// 简易计算器逻辑
+/* ===================== 天/小时/分钟转总分钟 点击事件 ===================== */
+// 绑定按钮：#time-calc-btn
+// 读取输入：#time-day 天、#time-hour 小时、#time-min 分钟
+// 换算规则：1天=1440分钟，1小时=60分钟
+// 输出结果：#time-total 总分钟
+document.getElementById("time-calc-btn").onclick = function(){
+    const day = Number(document.getElementById("time-day").value) || 0;
+    const hour = Number(document.getElementById("time-hour").value) || 0;
+    const min = Number(document.getElementById("time-min").value) || 0;
+    const total = day * 1440 + hour * 60 + min;
+    document.getElementById("time-total").value = total.toLocaleString();
+}
+/* ===================== 简易计算器全部按钮点击逻辑 ===================== */
+// 绑定容器：所有 .calc-num-btn 计算器按键
+// 显示屏幕：#calc-display
+// 功能：数字/符号填入、删除、清空、eval计算表达式
 const display = document.getElementById("calc-display");
 document.querySelectorAll(".calc-num-btn").forEach(btn=>{
     btn.addEventListener("click", ()=>{
         const val = btn.dataset.val;
         if(val === "C"){
+            // C键：清空屏幕
             display.value = "";
         }else if(val === "back"){
+            // ←退格：删除最后一位字符
             display.value = display.value.slice(0,-1);
         }else if(val === "="){
+            // = 等于：替换×为*，执行计算，捕获错误
             try{
                 let exp = display.value.replace(/×/g,"*");
                 let res = eval(exp);
@@ -515,12 +565,14 @@ document.querySelectorAll(".calc-num-btn").forEach(btn=>{
                 display.value = "计算错误";
             }
         }else{
+            // 数字/小数点/运算符直接拼接输入框
             display.value += val;
         }
     })
 })
-
-// 自适应iframe高度
+/* ===================== iframe自适应高度函数 ===================== */
+// 作用：页面高度变化时，向父页面发送高度消息，解决iframe高度适配
+// 触发时机：页面加载完成、窗口缩放时执行
 function updateFrameHeight() {
     const realHeight = document.body.scrollHeight;
     window.parent.postMessage({ iframeHeight: realHeight }, '*');
